@@ -3,15 +3,15 @@ spring:
     name: flash-sale-engine
 
   datasource:
-    url: jdbc:mysql://localhost:3306/flash_sale_engine?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/flash_sale_db?useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: root1234
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
@@ -19,3 +19,14 @@ spring:
   flyway:
     enabled: true
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: 1000ms
