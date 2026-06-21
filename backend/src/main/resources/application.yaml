@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: flash-sale-engine
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/flash_sale_engine?useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+
