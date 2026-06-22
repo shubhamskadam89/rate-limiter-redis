@@ -32,5 +32,6 @@ spring:
           max-wait: 1000ms
 
 ratelimit:
+  algorithm: SLIDING_WINDOW
   max-requests: 4
   window-seconds: 60

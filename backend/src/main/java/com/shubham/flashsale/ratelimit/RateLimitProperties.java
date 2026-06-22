@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "ratelimit")
 public class RateLimitProperties {
 
+    private RateLimitAlgorithm algorithm;
     private long maxRequests;
     private long windowSeconds;
 }
