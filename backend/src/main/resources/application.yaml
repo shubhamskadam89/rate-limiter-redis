@@ -30,3 +30,7 @@ spring:
           max-idle: 8
           min-idle: 2
           max-wait: 1000ms
+
+ratelimit:
+  max-requests: 4
+  window-seconds: 60
