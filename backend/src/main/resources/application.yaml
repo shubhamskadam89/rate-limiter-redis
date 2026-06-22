@@ -32,6 +32,8 @@ spring:
           max-wait: 1000ms
 
 ratelimit:
-  algorithm: SLIDING_WINDOW
-  max-requests: 4
-  window-seconds: 60
+  algorithm: TOKEN_BUCKET
+#  max-requests: 4
+#  window-seconds: 60
+  burst-capacity: 5
+  refill-rate: 1

@@ -1,15 +1,13 @@
-package com.shubham.flashsale.ratelimit;
+package com.shubham.flashsale.ratelimit.algorithm;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.shubham.flashsale.ratelimit.RateLimitProperties;
+import com.shubham.flashsale.ratelimit.RateLimitResult;
+import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
+import com.shubham.flashsale.ratelimit.RedisKeyBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
 import java.time.Duration;
 
 @Service
@@ -42,7 +40,10 @@ public class FixedWindowStrategy implements RateLimitingStrategy {
 
         boolean allowed  = count<= rateLimitProperties.getMaxRequests();
 
-        return new RateLimitResult(allowed,count,remaining);
+        return new RateLimitResult(allowed,
+                count,
+                remaining,
+                null);
     }
 
 

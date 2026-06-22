@@ -14,4 +14,6 @@ public class RateLimitProperties {
     private RateLimitAlgorithm algorithm;
     private long maxRequests;
     private long windowSeconds;
+    private long burstCapacity;
+    private double refillRate;
 }

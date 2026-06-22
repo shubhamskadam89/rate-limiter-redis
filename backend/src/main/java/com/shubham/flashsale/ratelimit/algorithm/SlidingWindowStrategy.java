@@ -1,21 +1,22 @@
-package com.shubham.flashsale.ratelimit;
+package com.shubham.flashsale.ratelimit.algorithm;
 
+import com.shubham.flashsale.ratelimit.RateLimitProperties;
+import com.shubham.flashsale.ratelimit.RateLimitResult;
+import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
+import com.shubham.flashsale.ratelimit.RedisKeyBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
-public class SlidingWindowStrategy implements RateLimitingStrategy{
+public class SlidingWindowStrategy implements RateLimitingStrategy {
 
     private final StringRedisTemplate redisTemplate;
     private final RateLimitProperties properties;
@@ -83,7 +84,8 @@ public class SlidingWindowStrategy implements RateLimitingStrategy{
         return new RateLimitResult(
                 allowed,
                 count,
-                remaining
+                remaining,
+                null
         );
     }
 

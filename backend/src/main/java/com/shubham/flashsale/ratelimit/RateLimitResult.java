@@ -6,6 +6,6 @@ import lombok.Getter;
 public record RateLimitResult(
         boolean allowed,
         long currentCount,
-        long remainingRequests
-) {
-}
+        long remaining,
+        Long retryAfterMs
+){}

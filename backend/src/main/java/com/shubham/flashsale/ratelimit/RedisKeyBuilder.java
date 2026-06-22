@@ -15,4 +15,8 @@ public final class RedisKeyBuilder {
     public static String slidingWindow(String identifier) {
         return "rate:sw:" + identifier;
     }
+
+    public static String tokenBucket(String identifier) {
+        return "rate:tb:" + identifier;
+    }
 }
