@@ -17,11 +17,11 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 
     private final RateLimiterService rateLimiterService;
 
-//    @Override
-//    protected boolean shouldNotFilter(HttpServletRequest request) {
-//
-//        return !request.getRequestURI().startsWith("/products");
-//    }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        return request.getRequestURI().startsWith("/test");
+    }
 
     @Override
     protected void doFilterInternal(
