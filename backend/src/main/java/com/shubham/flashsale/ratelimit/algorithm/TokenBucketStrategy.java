@@ -1,9 +1,7 @@
 package com.shubham.flashsale.ratelimit.algorithm;
 
-import com.shubham.flashsale.ratelimit.RateLimitProperties;
-import com.shubham.flashsale.ratelimit.RateLimitResult;
-import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
-import com.shubham.flashsale.ratelimit.RedisKeyBuilder;
+import com.shubham.flashsale.ratelimit.*;
+import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -20,9 +18,11 @@ public class TokenBucketStrategy  implements RateLimitingStrategy {
     private final RateLimitProperties properties;
 
     @Override
-    public RateLimitResult checkLimit(String identifier) {
-
-        String key = RedisKeyBuilder.tokenBucket(identifier);
+    public RateLimitResult checkLimit(RateLimitIdentity identifier) {
+        String key =
+                RedisKeyBuilder.tokenBucket(
+                        identifier.key()
+                );
 
         List<?> result =
                 redisTemplate.execute(

@@ -1,6 +1,7 @@
 package com.shubham.flashsale.ratelimit;
 
 import com.shubham.flashsale.ratelimit.algorithm.SlidingWindowStrategy;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,17 +22,17 @@ public class TestController {
     private final StringRedisTemplate redisTemplate;
 
     @GetMapping("/limit")
-    public RateLimitResult test() {
+    public RateLimitResult test(HttpServletRequest request) {
 
         return rateLimiterService
-                .checkLimit("demo-user");
+                .checkLimit(request);
     }
 
-    @GetMapping("/sw")
-    public RateLimitResult testSliding() {
-        return rateLimiterService
-                .checkLimit("demo-user");
+    @GetMapping("/public/limit")
+    public RateLimitResult test2(HttpServletRequest request){
+        return rateLimiterService.checkLimit(request);
     }
+
 
 
     @GetMapping("/pipeline")

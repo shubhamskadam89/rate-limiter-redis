@@ -1,5 +1,6 @@
 package com.shubham.flashsale.auth.jwt;
 
+import com.shubham.flashsale.auth.dto.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -20,8 +21,11 @@ public class JwtService {
 
     public String generateToken(UserDetails principal) {
         Instant now = Instant.now();
+        UserDetailsImpl userDetails =
+                (UserDetailsImpl) principal;
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
-                .subject(principal.getUsername())
+                .subject(userDetails.getUsername())
+                .claim("userId", userDetails.user().getId())
                 .issuedAt(now)
                 .expiresAt(now.plusMillis(jwtProperties.getExpiration()))
                 .build();
