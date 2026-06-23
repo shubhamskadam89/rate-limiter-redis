@@ -33,6 +33,8 @@ spring:
 
 ratelimit:
   algorithm: TOKEN_BUCKET
+  max-requests: 5
+  window-seconds: 60
   burst-capacity: 5
   refill-rate: 1
 

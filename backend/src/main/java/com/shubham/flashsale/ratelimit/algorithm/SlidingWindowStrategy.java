@@ -4,6 +4,7 @@ import com.shubham.flashsale.ratelimit.RateLimitProperties;
 import com.shubham.flashsale.ratelimit.RateLimitResult;
 import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
 import com.shubham.flashsale.ratelimit.RedisKeyBuilder;
+import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,10 +23,11 @@ public class SlidingWindowStrategy implements RateLimitingStrategy {
     private final RateLimitProperties properties;
 
     @Override
-    public RateLimitResult checkLimit(String identifier) {
-
+    public RateLimitResult checkLimit(RateLimitIdentity identifier) {
         String key =
-                RedisKeyBuilder.slidingWindow(identifier);
+                RedisKeyBuilder.slidingWindow(
+                        identifier.key()
+                );
 
         long now =
                 Instant.now().toEpochMilli();
@@ -61,7 +63,7 @@ public class SlidingWindowStrategy implements RateLimitingStrategy {
 
                             connection.expire(
                                     redisKey,
-                                    properties.getWindowSeconds()
+                                    properties.getWindowSeconds() * 2L
                             );
 
                             return null;

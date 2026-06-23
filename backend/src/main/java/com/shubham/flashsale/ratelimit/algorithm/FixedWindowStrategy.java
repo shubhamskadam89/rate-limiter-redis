@@ -4,6 +4,7 @@ import com.shubham.flashsale.ratelimit.RateLimitProperties;
 import com.shubham.flashsale.ratelimit.RateLimitResult;
 import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
 import com.shubham.flashsale.ratelimit.RedisKeyBuilder;
+import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,11 @@ public class FixedWindowStrategy implements RateLimitingStrategy {
 
 
     @Override
-    public RateLimitResult checkLimit(String identifier){
-        String key = RedisKeyBuilder.fixedWindow(identifier);
+    public RateLimitResult checkLimit(RateLimitIdentity identifier){
+        String key =
+                RedisKeyBuilder.fixedWindow(
+                        identifier.key()
+                );
 
         Long count  =  stringRedisTemplate
                 .opsForValue()

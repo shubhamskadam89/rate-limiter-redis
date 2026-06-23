@@ -17,14 +17,13 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 
     private final RateLimiterService rateLimiterService;
 
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        RateLimitResult result = rateLimiterService.checkLimit(("demo-user"));
+        RateLimitResult result = rateLimiterService.checkLimit((request));
 
         if(!result.allowed()){
 
