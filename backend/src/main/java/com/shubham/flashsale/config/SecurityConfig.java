@@ -1,6 +1,6 @@
 package com.shubham.flashsale.config;
 
-import com.shubham.flashsale.auth.CustomUserDetailsService;
+import com.shubham.flashsale.auth.service.CustomUserDetailsService;
 import com.shubham.flashsale.auth.jwt.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

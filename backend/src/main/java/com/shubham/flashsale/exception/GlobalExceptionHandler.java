@@ -28,4 +28,64 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiErrorResponse);
     }
 
+    @ExceptionHandler(RefreshTokenNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> refreshTokenNotFound(
+            RefreshTokenNotFoundException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response =
+                new ApiErrorResponse(
+                        Instant.now(),
+                        HttpStatus.UNAUTHORIZED,
+                        ex.getMessage(),
+                        "REFRESH_TOKEN_NOT_FOUND",
+                        request.getRequestURI(),
+                        null
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<ApiErrorResponse> refreshTokenExpired(
+            RefreshTokenExpiredException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response =
+                new ApiErrorResponse(
+                        Instant.now(),
+                        HttpStatus.UNAUTHORIZED,
+                        ex.getMessage(),
+                        "REFRESH_TOKEN_EXPIRED",
+                        request.getRequestURI(),
+                        null
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
+    @ExceptionHandler(RefreshTokenRevokedException.class)
+    public ResponseEntity<ApiErrorResponse> refreshTokenRevoked(
+            RefreshTokenRevokedException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response =
+                new ApiErrorResponse(
+                        Instant.now(),
+                        HttpStatus.UNAUTHORIZED,
+                        ex.getMessage(),
+                        "REFRESH_TOKEN_REVOKED",
+                        request.getRequestURI(),
+                        null
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
 }
