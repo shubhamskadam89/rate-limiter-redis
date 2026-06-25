@@ -1,7 +1,4 @@
-package com.shubham.flashsale.ratelimit;
-
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+package com.shubham.flashsale.common.redis;
 
 
 public final class RedisKeyBuilder {

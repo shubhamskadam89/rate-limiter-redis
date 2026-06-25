@@ -3,7 +3,7 @@ package com.shubham.flashsale.ratelimit.algorithm;
 import com.shubham.flashsale.ratelimit.RateLimitProperties;
 import com.shubham.flashsale.ratelimit.RateLimitResult;
 import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
-import com.shubham.flashsale.ratelimit.RedisKeyBuilder;
+import com.shubham.flashsale.common.redis.RedisKeyBuilder;
 import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
