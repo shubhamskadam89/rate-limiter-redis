@@ -1,667 +1,613 @@
 {
   "info": {
-    "_postman_id": "a4b2c1d8-ef82-4c2b-9276-f38b1d9bf12a",
-    "name": "Flash Sale Engine API Endpoints Test",
-    "description": "Automated Postman Collection to test all REST endpoints of the Flash Sale Engine in sequence.",
+    "_postman_id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+    "name": "Flash Sale Engine - Complete API Test Suite",
+    "description": "Comprehensive Postman Collection covering all REST endpoints of the Flash Sale Engine.\n\nRun requests in order (01 → 17):\n1. Auth: register → login → /me\n2. Products: create → get by UUID → list all\n3. Sale Admin: create sale → add item → activate\n4. Purchase & Orders: purchase item → get order\n5. Token: refresh → logout\n6. Rate limit & Redis pipeline tests\n\nAll tokens and UUIDs are automatically captured into collection variables.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "1. Register Admin User",
-      "event": [
+      "name": "Auth",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Register request completed\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"postman_admin@flashsale.com\",\n  \"password\": \"password123\",\n  \"role\": \"ADMIN\",\n  \"fullName\": \"Postman Admin User\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/v1/register",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "auth",
-            "v1",
-            "register"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "2. Login",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Login successful and tokens captured\", function () {",
-              "    pm.response.to.have.status(200);",
-              "    var jsonData = pm.response.json();",
-              "    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
-              "    pm.collectionVariables.set(\"refreshToken\", jsonData.refreshToken);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"postman_admin@flashsale.com\",\n  \"password\": \"password123\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/v1/login",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "auth",
-            "v1",
-            "login"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "3. Get Logged-in User Info (/me)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Successfully retrieved user info\", function () {",
-              "    pm.response.to.have.status(200);",
-              "    pm.expect(pm.response.text()).to.equal(\"postman_admin@flashsale.com\");",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "01 - Register Admin User",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Register: 200 OK or 400 already exists', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    var j = pm.response.json();",
+                  "    pm.test('Response has email', function () { pm.expect(j).to.have.property('email'); });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/me",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "auth",
-            "me"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "4. Create Product (Map-based Metadata)",
-      "event": [
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"postman_admin@flashsale.com\",\n  \"password\": \"password123\",\n  \"role\": \"ADMIN\",\n  \"fullName\": \"Postman Admin User\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          },
+          "response": []
+        },
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Product created and ID captured\", function () {",
-              "    pm.response.to.have.status(200);",
-              "    var jsonData = pm.response.json();",
-              "    pm.collectionVariables.set(\"productId\", jsonData.id);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "02 - Register Regular User",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Register user: 200 OK or 400 already exists', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Postman Mechanical Keyboard\",\n  \"description\": \"Premium Hot-swappable RGB Mechanical Keyboard\",\n  \"basePrice\": 5999.00,\n  \"metadata\": {\n    \"brand\": \"Keychron\",\n    \"switch\": \"Brown\",\n    \"layout\": \"ANSI 75%\"\n  }\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/products/v1",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "products",
-            "v1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "5. Get Product by ID",
-      "event": [
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"postman_user@flashsale.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\",\n  \"fullName\": \"Postman Regular User\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          },
+          "response": []
+        },
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Successfully retrieved product\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "03 - Login (Admin)",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login successful and tokens captured', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('accessToken');",
+                  "    pm.expect(j).to.have.property('refreshToken');",
+                  "    pm.collectionVariables.set('accessToken', j.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', j.refreshToken);",
+                  "    console.log('Access token captured:', j.accessToken.substring(0, 20) + '...');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/products/v1/{{productId}}",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "products",
-            "v1",
-            "{{productId}}"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "6. Get All Products",
-      "event": [
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"postman_admin@flashsale.com\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "response": []
+        },
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Successfully retrieved all products\", function () {",
-              "    pm.response.to.have.status(200);",
-              "    pm.expect(pm.response.json()).to.be.an('array');",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "04 - Get Logged-in User (/me)",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('User info returned successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.text()).to.include('postman_admin@flashsale.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/products/v1",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "products",
-            "v1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "7. Create Sale Event",
-      "event": [
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "me"]
+            }
+          },
+          "response": []
+        },
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Sale event created and ID captured\", function () {",
-              "    pm.response.to.have.status(200);",
-              "    var jsonData = pm.response.json();",
-              "    pm.collectionVariables.set(\"saleId\", jsonData.saleId);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "05 - Refresh Access Token",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Tokens refreshed successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('accessToken');",
+                  "    pm.expect(j).to.have.property('refreshToken');",
+                  "    pm.collectionVariables.set('accessToken', j.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', j.refreshToken);",
+                  "    console.log('Tokens refreshed successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Postman Super Flash Sale\",\n  \"startTime\": \"2026-06-25T18:00:00\",\n  \"endTime\": \"2026-06-25T20:00:00\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/admin/sales/v1",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "admin",
-            "sales",
-            "v1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "8. Add Item to Sale Event",
-      "event": [
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "refresh"]
+            }
+          },
+          "response": []
+        },
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Item added to sale successfully\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "06 - Logout",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logged out successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.collectionVariables.set('refreshToken', '');",
+                  "    console.log('Logged out — refresh token cleared');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"productId\": {{productId}},\n  \"salePrice\": 3999.00,\n  \"inventory\": 100,\n  \"maxPerUser\": 1\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/admin/sales/v1/{{saleId}}/items",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "admin",
-            "sales",
-            "v1",
-            "{{saleId}}",
-            "items"
-          ]
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "logout"]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "9. Activate Sale Event",
-      "event": [
+      "name": "Products",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Sale activated successfully\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "07 - Create Product",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Product created and UUID captured', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('uuid');",
+                  "    pm.collectionVariables.set('productUuid', j.uuid);",
+                  "    console.log('Product UUID:', j.uuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "POST",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/admin/sales/v1/{{saleId}}/activate",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "api",
-            "admin",
-            "sales",
-            "v1",
-            "{{saleId}}",
-            "activate"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "10. Refresh Access Token",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Tokens refreshed and captured\", function () {",
-              "    pm.response.to.have.status(200);",
-              "    var jsonData = pm.response.json();",
-              "    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
-              "    pm.collectionVariables.set(\"refreshToken\", jsonData.refreshToken);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Mechanical Keyboard\",\n  \"description\": \"Premium Hot-swappable RGB Mechanical Keyboard\",\n  \"basePrice\": 5999.00,\n  \"metadata\": {\n    \"brand\": \"Keychron\",\n    \"switch\": \"Brown\",\n    \"layout\": \"ANSI 75%\",\n    \"backlighting\": \"RGB\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/v1/refresh",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "auth",
-            "v1",
-            "refresh"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "11. Test Authenticated Rate Limit",
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Rate limit check returns results\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "08 - Get Product by UUID",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Product retrieved successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('name');",
+                  "    pm.expect(j).to.have.property('basePrice');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/{{productUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "{{productUuid}}"]
+            }
+          },
+          "response": []
         },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/test/limit",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "test",
-            "limit"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "12. Test Public Rate Limit",
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Public rate limit check returns results\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/test/public/limit",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "test",
-            "public",
-            "limit"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "13. Test Redis Pipeline",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Pipeline endpoint returns successful execution string\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
+          "name": "09 - Get All Products",
+          "event": [
             {
-              "key": "token",
-              "value": "{{accessToken}}",
-              "type": "string"
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('All products returned as array', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.be.an('array');",
+                  "    console.log('Total products:', j.length);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
             }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/test/pipeline",
-          "host": [
-            "{{baseUrl}}"
           ],
-          "path": [
-            "test",
-            "pipeline"
-          ]
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "14. Logout",
-      "event": [
+      "name": "Sale Events (Admin)",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Logged out successfully\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/v1/logout",
-          "host": [
-            "{{baseUrl}}"
+          "name": "10 - Create Sale Event",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var now = new Date();",
+                  "var start = new Date(now.getTime() + 2 * 60 * 1000);",
+                  "var end   = new Date(now.getTime() + 62 * 60 * 1000);",
+                  "function fmt(d) {",
+                  "    var p = n => String(n).padStart(2,'0');",
+                  "    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());",
+                  "}",
+                  "pm.collectionVariables.set('saleStartTime', fmt(start));",
+                  "pm.collectionVariables.set('saleEndTime', fmt(end));",
+                  "console.log('Sale window:', fmt(start), '->', fmt(end));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Sale event created and UUID captured', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('saleUuid');",
+                  "    pm.collectionVariables.set('saleUuid', j.saleUuid);",
+                  "    console.log('Sale UUID:', j.saleUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
           ],
-          "path": [
-            "api",
-            "auth",
-            "v1",
-            "logout"
-          ]
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Flash Sale\",\n  \"startTime\": \"{{saleStartTime}}\",\n  \"endTime\": \"{{saleEndTime}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11 - Add Item to Sale Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Sale item added and UUID captured', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('saleItemUuid');",
+                  "    pm.collectionVariables.set('saleItemUuid', j.saleItemUuid);",
+                  "    console.log('Sale Item UUID:', j.saleItemUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productUuid\": \"{{productUuid}}\",\n  \"salePrice\": 3999.00,\n  \"inventory\": 100,\n  \"maxPerUser\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/sales/{{saleUuid}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "sales", "{{saleUuid}}", "items"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12 - Activate Sale Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Sale activated successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('saleUuid');",
+                  "    console.log('Sale activated:', j.saleUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/sales/{{saleUuid}}/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "sales", "{{saleUuid}}", "activate"]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "Purchase and Orders",
+      "item": [
+        {
+          "name": "13 - Purchase Sale Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Purchase successful and order UUID captured', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('orderUuid');",
+                  "    pm.collectionVariables.set('orderUuid', j.orderUuid);",
+                  "    console.log('Order UUID:', j.orderUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/sales/{{saleUuid}}/items/{{saleItemUuid}}/purchase",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "sales", "{{saleUuid}}", "items", "{{saleItemUuid}}", "purchase"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14 - Get Order by UUID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Order details retrieved', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('orderUuid');",
+                  "    console.log('Order:', JSON.stringify(j, null, 2));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "{{orderUuid}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rate Limit and Redis Tests",
+      "item": [
+        {
+          "name": "15 - Authenticated Rate Limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Authenticated rate limit check passes', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    console.log('Rate limit result:', JSON.stringify(pm.response.json()));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/test/limit",
+              "host": ["{{baseUrl}}"],
+              "path": ["test", "limit"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16 - Public Rate Limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Public rate limit check passes', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    console.log('Public rate limit result:', JSON.stringify(pm.response.json()));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/test/public/limit",
+              "host": ["{{baseUrl}}"],
+              "path": ["test", "public", "limit"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "17 - Redis Pipeline Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Redis pipeline executes successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.text()).to.be.a('string');",
+                  "    console.log('Pipeline result:', pm.response.text());",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/test/pipeline",
+              "host": ["{{baseUrl}}"],
+              "path": ["test", "pipeline"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8080",
-      "type": "string"
-    },
-    {
-      "key": "accessToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "refreshToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "productId",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "saleId",
-      "value": "",
-      "type": "string"
-    }
+    { "key": "baseUrl",       "value": "http://localhost:8080", "type": "string", "description": "Base URL — update if your server port differs" },
+    { "key": "accessToken",   "value": "", "type": "string", "description": "JWT access token (auto-populated by Login)" },
+    { "key": "refreshToken",  "value": "", "type": "string", "description": "JWT refresh token (auto-populated by Login)" },
+    { "key": "productUuid",   "value": "", "type": "string", "description": "Product UUID (auto-populated by Create Product)" },
+    { "key": "saleUuid",      "value": "", "type": "string", "description": "Sale event UUID (auto-populated by Create Sale Event)" },
+    { "key": "saleItemUuid",  "value": "", "type": "string", "description": "Sale item UUID (auto-populated by Add Item to Sale)" },
+    { "key": "orderUuid",     "value": "", "type": "string", "description": "Order UUID (auto-populated by Purchase Sale Item)" },
+    { "key": "saleStartTime", "value": "", "type": "string", "description": "Sale start time (auto-computed in Pre-request script)" },
+    { "key": "saleEndTime",   "value": "", "type": "string", "description": "Sale end time (auto-computed in Pre-request script)" }
   ]
 }

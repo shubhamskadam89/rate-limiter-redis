@@ -90,5 +90,3 @@ jacoco.exec
 *.pid
 *.seed
 *.pid.lock
-
-

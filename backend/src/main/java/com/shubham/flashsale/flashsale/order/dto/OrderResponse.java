@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -14,18 +15,22 @@ import java.time.Instant;
 @NoArgsConstructor
 public class OrderResponse {
 
-    private String orderId;
+    UUID orderUuid;
 
-    private String saleId;
+    UUID saleItemUuid;
 
-    private String productId;
+    UUID productUuid;
 
-    private Integer quantity;
+    String productName;
 
-    private BigDecimal price;
+    Integer quantity;
 
-    private String status;
+    BigDecimal unitPrice;
 
-    private Instant createdAt;
+    BigDecimal totalPrice;
+
+    String status;
+
+    Instant createdAt;
 
 }

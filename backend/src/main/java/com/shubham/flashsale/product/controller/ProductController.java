@@ -9,39 +9,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping("/v1")
+    @PostMapping
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @RequestBody CreateProductRequest request
     ) {
-
-        return ResponseEntity.ok(
-                productService.createProduct(request)
-        );
+        return ResponseEntity.ok(productService.createProduct(request));
     }
 
-    @GetMapping("/v1/{id}")
+    @GetMapping("/{productUuid}")
     public ResponseEntity<ProductResponse> getProduct(
-            @PathVariable Long id
+            @PathVariable UUID productUuid
     ) {
-
-        return ResponseEntity.ok(
-                productService.getProduct(id)
-        );
+        return ResponseEntity.ok(productService.getProduct(productUuid.toString()));
     }
 
-    @GetMapping("/v1")
+    @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
-
-        return ResponseEntity.ok(
-                productService.getAllProducts()
-        );
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 }

@@ -24,4 +24,12 @@ public class LuaScriptConfig {
         script.setResultType(List.class);
         return script;
     }
+
+    @Bean
+    public RedisScript<List> flashSalePurchaseScript() {
+        DefaultRedisScript<List> script = new DefaultRedisScript<>();
+        script.setLocation(new ClassPathResource("scripts/lua/flash_sale_purchase.lua"));
+        script.setResultType(List.class);
+        return script;
+    }
 }

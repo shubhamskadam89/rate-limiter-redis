@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
-
-@Getter
-@RequiredArgsConstructor
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-
+@Getter
+@Setter
 public class Order extends BaseEntity {
 
 

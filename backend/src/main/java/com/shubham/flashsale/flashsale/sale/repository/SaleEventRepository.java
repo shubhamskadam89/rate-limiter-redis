@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SaleEventRepository extends JpaRepository<SaleEvent,Long> {
 
@@ -21,5 +22,6 @@ public interface SaleEventRepository extends JpaRepository<SaleEvent,Long> {
             Status status,
             LocalDateTime now
     );
+    Optional<SaleEvent> findByUuid(String uuid);
 
 }

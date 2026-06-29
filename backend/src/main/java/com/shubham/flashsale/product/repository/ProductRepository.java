@@ -7,11 +7,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-
-
     Optional<Product> findByUuid(String uuid);
-
-
-
-
+    boolean existsByUuid(String uuid);
 }

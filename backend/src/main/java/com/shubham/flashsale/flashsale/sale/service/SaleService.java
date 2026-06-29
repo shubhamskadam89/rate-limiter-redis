@@ -14,13 +14,13 @@ public interface SaleService {
     );
 
     SaleItemResponse addItemToSale(
-            Long saleId,
+            String saleUuid,
             AddSaleItemRequest request
     );
 
     SaleResponse activateSale(
-            Long saleId
+            String saleUuid
     );
 
-    SaleResponse getSale(Long saleId);
+    SaleResponse getSale(String saleUuid);
 }

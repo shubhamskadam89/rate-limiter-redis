@@ -57,7 +57,7 @@ public class AuthService {
         userRepository.save(user);
         log.warn("{} SAVED TO DATABASE",user.getFullName());
 
-        return new UserResponseDto(user.getUuid(),
+        return new UserResponseDto(UUID.fromString(user.getUuid()),
                 user.getEmail(),
                 user.getRole(),
                 user.getIsActive()

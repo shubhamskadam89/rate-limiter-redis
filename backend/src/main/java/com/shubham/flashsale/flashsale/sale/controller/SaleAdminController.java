@@ -12,32 +12,41 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 
-@Slf4j
+
 @RestController
-@RequestMapping("/api/admin/sales")
+@RequestMapping("/api/v1/admin/sales")
 @RequiredArgsConstructor
 public class SaleAdminController {
 
     private final SaleService saleService;
 
-    @PostMapping("/v1")
-    public ResponseEntity<SaleResponse> createSaleRequest(@RequestBody CreateSaleRequest createSaleRequest){
-        log.warn("1");
-        return ResponseEntity.ok(saleService.createSale(createSaleRequest));
+    @PostMapping
+    public ResponseEntity<SaleResponse> createSale(
+            @RequestBody CreateSaleRequest request
+    ) {
+        return ResponseEntity.ok(
+                saleService.createSale(request)
+        );
     }
 
-    @PostMapping("/v1/{id}/activate")
-    public ResponseEntity<SaleResponse> activateSale(@PathVariable Long id){
-       return ResponseEntity.ok(saleService.activateSale(id));
-    }
-    @PostMapping("/v1/{saleId}/items")
-    public ResponseEntity<SaleItemResponse> addItemToSale(
-            @PathVariable Long saleId,
-            @RequestBody AddSaleItemRequest request
-    ){
+    @PostMapping("/{saleUuid}/activate")
+    public ResponseEntity<SaleResponse> activateSale(
+            @PathVariable UUID saleUuid
+    ) {
         return ResponseEntity.ok(
-                saleService.addItemToSale(saleId, request)
+                saleService.activateSale(saleUuid.toString())
+        );
+    }
+
+    @PostMapping("/{saleUuid}/items")
+    public ResponseEntity<SaleItemResponse> addItemToSale(
+            @PathVariable UUID saleUuid,
+            @RequestBody AddSaleItemRequest request
+    ) {
+        return ResponseEntity.ok(
+                saleService.addItemToSale(saleUuid.toString(), request)
         );
     }
 }

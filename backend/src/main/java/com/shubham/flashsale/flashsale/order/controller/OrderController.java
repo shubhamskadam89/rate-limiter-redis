@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -19,8 +18,12 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID id){
-        return ResponseEntity.ok(orderService.getOrder(id));
+    @GetMapping("/{orderUuid}")
+    public ResponseEntity<OrderResponse> getOrder(
+            @PathVariable UUID orderUuid
+    ) {
+        return ResponseEntity.ok(
+                orderService.getOrder(orderUuid.toString())
+        );
     }
 }

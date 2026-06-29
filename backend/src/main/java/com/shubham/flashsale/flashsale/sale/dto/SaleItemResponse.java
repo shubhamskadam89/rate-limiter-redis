@@ -3,6 +3,7 @@ package com.shubham.flashsale.flashsale.sale.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,13 +12,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class SaleItemResponse {
 
-    private Long saleItemId;
 
-    private String saleItemUuid;
+    private UUID saleItemUuid;
 
-    private Long saleEventId;
+    private UUID saleEventUuid;
 
-    private Long productId;
+    private UUID productUuid;
 
     private String productName;
 

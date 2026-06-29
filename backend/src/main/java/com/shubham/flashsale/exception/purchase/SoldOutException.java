@@ -1,8 +1,9 @@
 package com.shubham.flashsale.exception.purchase;
 
+public class SoldOutException extends RuntimeException {
 
-import lombok.AllArgsConstructor;
+    public SoldOutException() {
+        super("Sale item is sold out");
+    }
 
-@AllArgsConstructor
-public class SoldOutException extends RuntimeException{
 }
