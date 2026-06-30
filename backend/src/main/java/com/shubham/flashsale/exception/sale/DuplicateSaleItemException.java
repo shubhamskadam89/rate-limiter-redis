@@ -2,10 +2,10 @@ package com.shubham.flashsale.exception.sale;
 
 public class DuplicateSaleItemException extends RuntimeException {
 
-    public DuplicateSaleItemException(Long saleId, Long productId) {
+    public DuplicateSaleItemException(String saleUuid, String productUuid) {
         super(
-                "Product " + productId +
-                        " already exists in sale " + saleId
+                "Product " + productUuid +
+                        " already exists in sale " + saleUuid
         );
     }
 }

@@ -4,12 +4,12 @@ public class NoSuchProductException
         extends RuntimeException {
 
     public NoSuchProductException(
-            Long productId
+            String productUuid
     ) {
 
         super(
                 "Product not found: " +
-                        productId
+                        productUuid
         );
     }
 }

@@ -1,9 +1,9 @@
 package com.shubham.flashsale.exception;
 
 import com.shubham.flashsale.exception.product.NoSuchProductException;
-import com.shubham.flashsale.exception.security.RefreshTokenExpiredException;
-import com.shubham.flashsale.exception.security.RefreshTokenNotFoundException;
-import com.shubham.flashsale.exception.security.RefreshTokenRevokedException;
+import com.shubham.flashsale.exception.purchase.*;
+import com.shubham.flashsale.exception.sale.*;
+import com.shubham.flashsale.exception.security.*;
 import com.shubham.flashsale.exception.user.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -18,100 +18,123 @@ import java.time.Instant;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    // ── User ────────────────────────────────────────────────────────────────
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ApiErrorResponse> userAlreadyExist(
-            UserAlreadyExistsException ex,
-            HttpServletRequest request){
-       ApiErrorResponse apiErrorResponse  = new ApiErrorResponse(
-               Instant.now(),
-               HttpStatus.CONFLICT,
-               ex.getMessage(),
-               "USER_WITH_MAIL_ALREADY_EXIST",
-               request.getRequestURI(),
-               null
-       );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiErrorResponse);
+            UserAlreadyExistsException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), "USER_ALREADY_EXISTS", request);
     }
+
+    // ── Security / Auth ──────────────────────────────────────────────────────
 
     @ExceptionHandler(RefreshTokenNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> refreshTokenNotFound(
-            RefreshTokenNotFoundException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response =
-                new ApiErrorResponse(
-                        Instant.now(),
-                        HttpStatus.UNAUTHORIZED,
-                        ex.getMessage(),
-                        "REFRESH_TOKEN_NOT_FOUND",
-                        request.getRequestURI(),
-                        null
-                );
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+            RefreshTokenNotFoundException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), "REFRESH_TOKEN_NOT_FOUND", request);
     }
 
     @ExceptionHandler(RefreshTokenExpiredException.class)
     public ResponseEntity<ApiErrorResponse> refreshTokenExpired(
-            RefreshTokenExpiredException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response =
-                new ApiErrorResponse(
-                        Instant.now(),
-                        HttpStatus.UNAUTHORIZED,
-                        ex.getMessage(),
-                        "REFRESH_TOKEN_EXPIRED",
-                        request.getRequestURI(),
-                        null
-                );
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+            RefreshTokenExpiredException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), "REFRESH_TOKEN_EXPIRED", request);
     }
 
     @ExceptionHandler(RefreshTokenRevokedException.class)
     public ResponseEntity<ApiErrorResponse> refreshTokenRevoked(
-            RefreshTokenRevokedException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response =
-                new ApiErrorResponse(
-                        Instant.now(),
-                        HttpStatus.UNAUTHORIZED,
-                        ex.getMessage(),
-                        "REFRESH_TOKEN_REVOKED",
-                        request.getRequestURI(),
-                        null
-                );
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+            RefreshTokenRevokedException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), "REFRESH_TOKEN_REVOKED", request);
     }
-    
+
+    // ── Product ──────────────────────────────────────────────────────────────
+
     @ExceptionHandler(NoSuchProductException.class)
     public ResponseEntity<ApiErrorResponse> noSuchProduct(
-            NoSuchProductException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response =
-                new ApiErrorResponse(
-                        Instant.now(),
-                        HttpStatus.BAD_REQUEST,
-                        ex.getMessage(),
-                        "NO_SUCH_PRODUCT",
-                        request.getRequestURI(),
-                        null
-                );
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
-        
+            NoSuchProductException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), "PRODUCT_NOT_FOUND", request);
+        // was BAD_REQUEST — 404 is correct for a missing resource
     }
 
+    // ── Sale ─────────────────────────────────────────────────────────────────
+
+    @ExceptionHandler(SaleEventNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> saleEventNotFound(
+            SaleEventNotFoundException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), "SALE_EVENT_NOT_FOUND", request);
+    }
+
+    @ExceptionHandler(SaleItemNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> saleItemNotFound(
+            SaleItemNotFoundException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), "SALE_ITEM_NOT_FOUND", request);
+    }
+
+    @ExceptionHandler(SaleAlreadyActiveException.class)
+    public ResponseEntity<ApiErrorResponse> saleAlreadyActive(
+            SaleAlreadyActiveException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), "SALE_ALREADY_ACTIVE", request);
+    }
+
+    @ExceptionHandler(DuplicateSaleItemException.class)
+    public ResponseEntity<ApiErrorResponse> duplicateSaleItem(
+            DuplicateSaleItemException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), "DUPLICATE_SALE_ITEM", request);
+    }
+
+    @ExceptionHandler(InvalidSaleException.class)
+    public ResponseEntity<ApiErrorResponse> invalidSale(
+            InvalidSaleException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), "INVALID_SALE", request);
+    }
+
+    @ExceptionHandler(InvalidSaleItemException.class)
+    public ResponseEntity<ApiErrorResponse> invalidSaleItem(
+            InvalidSaleItemException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), "INVALID_SALE_ITEM", request);
+    }
+
+    // ── Purchase ─────────────────────────────────────────────────────────────
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> orderNotFound(
+            OrderNotFoundException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), "ORDER_NOT_FOUND", request);
+    }
+
+    @ExceptionHandler(SoldOutException.class)
+    public ResponseEntity<ApiErrorResponse> soldOut(
+            SoldOutException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), "SOLD_OUT", request);
+    }
+
+    @ExceptionHandler(PurchaseLimitExceededException.class)
+    public ResponseEntity<ApiErrorResponse> purchaseLimitExceeded(
+            PurchaseLimitExceededException ex, HttpServletRequest request) {
+        return build(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), "PURCHASE_LIMIT_EXCEEDED", request);
+    }
+
+    @ExceptionHandler(PurchaseNotAllowedException.class)
+    public ResponseEntity<ApiErrorResponse> purchaseNotAllowed(
+            PurchaseNotAllowedException ex, HttpServletRequest request) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), "PURCHASE_NOT_ALLOWED", request);
+    }
+
+    // ── Fallback ─────────────────────────────────────────────────────────────
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleUnexpected(
+            Exception ex, HttpServletRequest request) {
+        log.error("Unhandled exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", "INTERNAL_ERROR", request);
+    }
+
+    // ── Helper ───────────────────────────────────────────────────────────────
+
+    private ResponseEntity<ApiErrorResponse> build(
+            HttpStatus status, String msg, String errorCode, HttpServletRequest request) {
+        ApiErrorResponse body = new ApiErrorResponse(
+                Instant.now(), status, msg, errorCode, request.getRequestURI(), null
+        );
+        return ResponseEntity.status(status).body(body);
+    }
 }

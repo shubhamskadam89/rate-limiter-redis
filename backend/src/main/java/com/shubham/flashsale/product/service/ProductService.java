@@ -12,7 +12,7 @@ public interface ProductService {
     );
 
     ProductResponse getProduct(
-            Long productId
+            String productUuid
     );
 
     List<ProductResponse> getAllProducts();

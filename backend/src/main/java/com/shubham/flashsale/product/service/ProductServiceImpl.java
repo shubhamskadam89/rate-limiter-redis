@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -50,13 +51,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse getProduct(
-            Long productId
+            String productUuid
     ) {
 
         Product product =
-                productRepository.findById(productId)
+                productRepository.findByUuid(productUuid)
                         .orElseThrow(
-                                () -> new NoSuchProductException(productId)
+                                () -> new NoSuchProductException(productUuid)
                         );
 
         return mapToResponse(product);
@@ -76,8 +77,7 @@ public class ProductServiceImpl implements ProductService {
     ) {
 
         return ProductResponse.builder()
-                .id(product.getId())
-                .uuid(product.getUuid())
+                .uuid(UUID.fromString(product.getUuid()))
                 .name(product.getName())
                 .description(product.getDescription())
                 .basePrice(product.getBasePrice())

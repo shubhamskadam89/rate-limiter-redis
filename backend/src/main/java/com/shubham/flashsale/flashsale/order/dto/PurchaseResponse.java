@@ -2,22 +2,24 @@ package com.shubham.flashsale.flashsale.order.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+import java.util.UUID;
+
+@Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class PurchaseResponse {
 
-    private Long orderId;
+    UUID orderUuid;
 
-    private String orderUuid;
+    UUID saleItemUuid;
 
-    private Long saleId;
+    UUID productUuid;
 
     private Integer quantity;
 
-    private Long remainingStock;
+    private Integer remainingInventory;
 
     private String message;
+
 }

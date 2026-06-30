@@ -38,7 +38,7 @@ public class IdempotencyStore {
 
         IdempotencyRecord record = IdempotencyRecord.builder()
                 .responseBody(response)
-                .status(status)
+                .statusCode(status)
                 .state(IdempotencyState.COMPLETED)
                 .build();
 

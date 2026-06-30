@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,9 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SaleResponse {
 
-    private Long saleId;
-
-    private String saleUuid;
+    private UUID saleUuid;
 
     private String name;
 

@@ -1,3 +1,5 @@
+-- token_bucket.lua
+
 -- KEYS[1] = rate:tb:{endpoint}:{userId}
 
 local key = KEYS[1]

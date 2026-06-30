@@ -3,6 +3,7 @@ package com.shubham.flashsale.product.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,9 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ProductResponse {
 
-    private Long id;
-
-    private String uuid;
+    private UUID uuid;
 
     private String name;
 

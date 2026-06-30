@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @Entity
 @Builder
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Table(
         name = "users",
         indexes = {

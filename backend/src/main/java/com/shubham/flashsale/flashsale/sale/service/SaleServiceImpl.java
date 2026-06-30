@@ -1,5 +1,6 @@
 package com.shubham.flashsale.flashsale.sale.service;
 
+import com.shubham.flashsale.common.CommonService;
 import com.shubham.flashsale.exception.product.NoSuchProductException;
 import com.shubham.flashsale.exception.sale.*;
 import com.shubham.flashsale.flashsale.sale.dto.AddSaleItemRequest;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -36,6 +38,7 @@ public class SaleServiceImpl implements SaleService {
     private final ProductRepository productRepository;
     private final SaleItemRepository saleItemRepository;
     private final UserRepository userRepository;
+    private final CommonService commonService;
 
     @Override
     @Transactional
@@ -45,7 +48,7 @@ public class SaleServiceImpl implements SaleService {
                 request.getName(), request.getStartTime(), request.getEndTime());
         validateSaleRequest(request);
 
-        User currentUser = getCurrentUser();
+        User currentUser = commonService.getCurrentUser();
 
         log.info("Creating sale campaign name={} by user={}",
                 request.getName(), currentUser.getEmail());
@@ -63,8 +66,7 @@ public class SaleServiceImpl implements SaleService {
         log.info("Sale campaign created id={} uuid={}", savedSale.getId(), savedSale.getUuid());
 
         return SaleResponse.builder()
-                .saleId(savedSale.getId())
-                .saleUuid(savedSale.getUuid())
+                .saleUuid(UUID.fromString(savedSale.getUuid()))
                 .name(savedSale.getName())
                 .startTime(savedSale.getStartTime())
                 .endTime(savedSale.getEndTime())
@@ -72,28 +74,30 @@ public class SaleServiceImpl implements SaleService {
                 .build();
     }
 
+
+
     @Override
     @Transactional
-    public SaleItemResponse addItemToSale(Long saleId, AddSaleItemRequest request) {
+    public SaleItemResponse addItemToSale(String saleUuid, AddSaleItemRequest request) {
 
-        log.debug("Adding item to sale saleId={} productId={}", saleId, request.getProductId());
+        log.debug("Adding item to sale saleId={} productId={}", saleUuid, request.getProductUuid());
 
-        SaleEvent saleEvent = saleEventRepository.findById(saleId)
+        SaleEvent saleEvent = saleEventRepository.findByUuid(saleUuid)
                 .orElseThrow(() -> {
-                    log.warn("Sale event not found saleId={}", saleId);
-                    return new SaleEventNotFoundException(saleId);
+                    log.warn("Sale event not found saleId={}", saleUuid);
+                    return new SaleEventNotFoundException(saleUuid);
                 });
 
         if (saleEvent.getStatus() != Status.DRAFT) {
             log.warn("Attempt to modify non-draft sale saleId={} status={}",
-                    saleId, saleEvent.getStatus());
-            throw new SaleAlreadyActiveException(saleId);
+                    saleUuid, saleEvent.getStatus());
+            throw new SaleAlreadyActiveException(saleUuid);
         }
 
-        Product product = productRepository.findById(request.getProductId())
+        Product product = productRepository.findByUuid(request.getProductUuid())
                 .orElseThrow(() -> {
-                    log.warn("Product not found productId={}", request.getProductId());
-                    return new NoSuchProductException(request.getProductId());
+                    log.warn("Product not found productId={}", request.getProductUuid());
+                    return new NoSuchProductException(request.getProductUuid());
                 });
 
         log.debug("Validating sale item request productId={} salePrice={} inventory={}",
@@ -101,8 +105,8 @@ public class SaleServiceImpl implements SaleService {
         validateSaleItemRequest(request, product);
 
         if (saleItemRepository.existsBySaleEventAndProduct(saleEvent, product)) {
-            log.warn("Duplicate product={} for sale={}", product.getId(), saleId);
-            throw new DuplicateSaleItemException(saleId, product.getId());
+            log.warn("Duplicate product={} for sale={}", product.getId(), saleUuid);
+            throw new DuplicateSaleItemException(saleUuid, product.getUuid());
         }
 
         SaleItem saleItem = SaleItem.builder()
@@ -117,13 +121,13 @@ public class SaleServiceImpl implements SaleService {
         SaleItem savedItem = saleItemRepository.save(saleItem);
 
         log.info("Product={} added to sale={} saleItemId={} uuid={}",
-                product.getId(), saleId, savedItem.getId(), savedItem.getUuid());
+                product.getId(), saleUuid, savedItem.getId(), savedItem.getUuid());
 
         return SaleItemResponse.builder()
-                .saleItemId(savedItem.getId())
-                .saleItemUuid(savedItem.getUuid())
-                .saleEventId(saleEvent.getId())
-                .productId(product.getId())
+
+                .saleItemUuid(UUID.fromString(savedItem.getUuid()))
+                .saleEventUuid(UUID.fromString(saleEvent.getUuid()))
+                .productUuid(UUID.fromString(product.getUuid()))
                 .productName(product.getName())
                 .salePrice(savedItem.getSalePrice())
                 .inventory(savedItem.getInventory())
@@ -132,38 +136,23 @@ public class SaleServiceImpl implements SaleService {
                 .build();
     }
 
+
+
     @Override
-    public SaleResponse activateSale(Long saleId) {
-        log.warn("activateSale called but not yet implemented saleId={}", saleId);
+    public SaleResponse activateSale(String saleUuid) {
+        log.warn("activateSale called but not yet implemented saleId={}", saleUuid);
         throw new UnsupportedOperationException("Will be implemented in Issue #11");
     }
 
+
+
     @Override
-    public SaleResponse getSale(Long saleId) {
-        log.debug("getSale called saleId={}", saleId);
+    public SaleResponse getSale(String saleUuid) {
+        log.debug("getSale called saleId={}", saleUuid);
         return null;
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
 
-        // Spring's oauth2ResourceServer sets the principal as a Jwt token, NOT UserDetailsImpl.
-        // We extract the subject claim (which is the user's email) and load the User from the DB.
-        if (!(principal instanceof Jwt jwt)) {
-            log.error("Principal is not a Jwt token. type={}", principal.getClass().getName());
-            throw new AccessDeniedException("Authenticated user not found");
-        }
-
-        String email = jwt.getSubject();
-        log.debug("Resolved current user email={} from JWT subject", email);
-
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("No user found in DB for JWT subject email={}", email);
-                    return new AccessDeniedException("User not found: " + email);
-                });
-    }
 
     private void validateSaleRequest(CreateSaleRequest request) {
         if (request.getEndTime().isBefore(request.getStartTime())) {

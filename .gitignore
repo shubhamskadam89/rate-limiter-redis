@@ -91,4 +91,11 @@ jacoco.exec
 *.seed
 *.pid.lock
 
-
+# =========================
+# Postman Local Dirs
+# =========================
+.postman/
+postman/
+backend/flash-sale-engine/
+README copy.md
+project_plan.md

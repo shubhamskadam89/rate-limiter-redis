@@ -1,6 +1,7 @@
 package com.shubham.flashsale.common.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
