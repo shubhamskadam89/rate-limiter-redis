@@ -57,4 +57,8 @@ public final class RedisKeyBuilder {
     public static String stockUpdates(String saleItemUuid) {
         return "stock:updates:" + saleItemUuid;
     }
+
+    public static String orderRetryQueue() {
+        return "orders:queue:retry";
+    }
 }

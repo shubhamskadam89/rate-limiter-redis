@@ -9,6 +9,7 @@ import com.shubham.flashsale.exception.sale.SaleItemNotFoundException;
 import com.shubham.flashsale.exception.sale.SaleNotActiveException;
 import com.shubham.flashsale.flashsale.order.dto.PurchaseResponse;
 import com.shubham.flashsale.flashsale.order.entity.Order;
+import com.shubham.flashsale.flashsale.order.queue.OrderQueueMessage;
 import com.shubham.flashsale.flashsale.order.repository.OrderRepository;
 import com.shubham.flashsale.flashsale.order.service.lua.PurchaseResult;
 import com.shubham.flashsale.flashsale.order.service.lua.PurchaseStatus;
@@ -189,5 +190,20 @@ public class CommonFlashSaleService {
             log.debug("Validation failed: non-positive maxPerUser={}", request.getMaxPerUser());
             throw new InvalidSaleItemException("Max per user must be greater than zero");
         }
+    }
+
+    public PurchaseResponse buildQueuedPurchaseResponse(
+            OrderQueueMessage message,
+            SaleItem saleItem,
+            PurchaseResult result
+    ) {
+        return PurchaseResponse.builder()
+                .orderUuid(UUID.fromString(message.getOrderUuid()))
+                .saleItemUuid(UUID.fromString(saleItem.getUuid()))
+                .productUuid(UUID.fromString(saleItem.getProduct().getUuid()))
+                .quantity(message.getQuantity())
+                .remainingInventory(result.remainingInventory())
+                .message("Purchase successful. Order queued for persistence")
+                .build();
     }
 }
