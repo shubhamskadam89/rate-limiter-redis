@@ -6,6 +6,8 @@ import com.shubham.flashsale.flashsale.common.CommonFlashSaleService;
 import com.shubham.flashsale.flashsale.order.dto.PurchaseRequest;
 import com.shubham.flashsale.flashsale.order.dto.PurchaseResponse;
 import com.shubham.flashsale.flashsale.order.entity.Order;
+import com.shubham.flashsale.flashsale.order.queue.OrderQueueMessage;
+import com.shubham.flashsale.flashsale.order.queue.OrderQueueProducer;
 import com.shubham.flashsale.flashsale.order.repository.OrderRepository;
 import com.shubham.flashsale.flashsale.order.service.lua.FlashSalePurchaseExecutor;
 import com.shubham.flashsale.flashsale.order.service.lua.PurchaseResult;
@@ -28,6 +30,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final CommonAuthService commonAuthService;
     private final SaleItemRepository saleItemRepository;
     private final CommonFlashSaleService commonFlashSaleService;
+    private final OrderQueueProducer orderQueueProducer;
 
     @Override
     @Transactional
@@ -64,14 +67,28 @@ public class PurchaseServiceImpl implements PurchaseService {
         commonFlashSaleService.validatePurchaseResult(result);
 
         log.info("Inventory reserved successfully in Redis. Persisting order to database for UserUUID: {}", user.getUuid());
-        Order savedOrder = commonFlashSaleService.persistOrder(
-                user,
-                saleItem,
+
+        OrderQueueMessage message = OrderQueueMessage.create(
+                user.getUuid(),
+                saleItem.getUuid(),
                 request.getQuantity(),
+                saleItem.getSalePrice(),
                 idempotencyKey
         );
 
-        log.info("Purchase flow completed successfully. OrderID: {}, OrderUUID: {}", savedOrder.getId(), savedOrder.getUuid());
-        return commonFlashSaleService.buildPurchaseResponse(savedOrder, saleItem, result);
+        orderQueueProducer.enqueue(message);
+
+        log.info(
+                "Purchase flow completed successfully. Order queued. orderUuid={}, userUuid={}, saleItemUuid={}",
+                message.getOrderUuid(),
+                user.getUuid(),
+                saleItem.getUuid()
+        );
+
+        return commonFlashSaleService.buildQueuedPurchaseResponse(
+                message,
+                saleItem,
+                result
+        );
     }
 }
