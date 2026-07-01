@@ -98,7 +98,8 @@ public class AuthService {
                 accessToken,
                 refreshToken.getToken(),
                 "Bearer",
-                jwtProperties.getExpiration()/1000
+                jwtProperties.getExpiration()/1000,
+                user.getRole().name()
         );
     }
     private String generateRefreshToken() {
@@ -129,7 +130,8 @@ public class AuthService {
                 accessToken,
                 newToken.getToken(),
                 "Bearer",
-                jwtProperties.getExpiration()/1000
+                jwtProperties.getExpiration()/1000,
+                user.getRole().name()
         );
     }
 

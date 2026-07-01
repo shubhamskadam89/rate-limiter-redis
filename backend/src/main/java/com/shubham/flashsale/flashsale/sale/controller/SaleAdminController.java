@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -47,6 +48,13 @@ public class SaleAdminController {
     ) {
         return ResponseEntity.ok(
                 saleService.addItemToSale(saleUuid.toString(), request)
+        );
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<SaleResponse>> getAllSale(){
+        return ResponseEntity.ok(
+                saleService.getAllSales()
         );
     }
 }

@@ -6,6 +6,8 @@ import com.shubham.flashsale.flashsale.sale.dto.CreateSaleRequest;
 import com.shubham.flashsale.flashsale.sale.dto.SaleItemResponse;
 import com.shubham.flashsale.flashsale.sale.dto.SaleResponse;
 
+import java.util.List;
+
 public interface SaleService {
 
 
@@ -23,4 +25,6 @@ public interface SaleService {
     );
 
     SaleResponse getSale(String saleUuid);
+
+    List<SaleResponse> getAllSales();
 }

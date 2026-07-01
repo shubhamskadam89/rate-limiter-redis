@@ -206,7 +206,25 @@ public class SaleServiceImpl implements SaleService {
                 .build();
     }
 
+    @Override
+    public List<SaleResponse> getAllSales() {
+        List<SaleEvent> saleEvents = saleEventRepository.findAll();
 
+
+        return saleEvents.stream()
+                .map(this::saleResponseBuilder)
+                .toList();
+    }
+
+    private SaleResponse saleResponseBuilder(SaleEvent saleEvent){
+        return SaleResponse.builder()
+                .saleUuid(UUID.fromString(saleEvent.getUuid()))
+                .name(saleEvent.getName())
+                .startTime(saleEvent.getStartTime())
+                .endTime(saleEvent.getEndTime())
+                .status(saleEvent.getStatus())
+                .build();
+    }
 
 
 }
