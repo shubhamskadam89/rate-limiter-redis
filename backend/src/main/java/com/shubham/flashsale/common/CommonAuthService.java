@@ -28,13 +28,13 @@ public class CommonAuthService {
             throw new AccessDeniedException("Authenticated user not found");
         }
 
-        String email = jwt.getSubject();
-        log.debug("Resolved current user email={} from JWT subject", email);
+        String uuid = jwt.getSubject();
+        log.debug("Resolved current user id={} from JWT subject", uuid);
 
-        return userRepository.findByEmail(email)
+        return userRepository.findByUuid(uuid)
                 .orElseThrow(() -> {
-                    log.error("No user found in DB for JWT subject email={}", email);
-                    return new AccessDeniedException("User not found: " + email);
+                    log.error("No user found in DB for JWT subject uuid={}", uuid);
+                    return new AccessDeniedException("User not found: " + uuid);
                 });
     }
 }

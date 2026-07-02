@@ -26,13 +26,12 @@ public class DefaultIdentityResolver implements IdentityResolver{
         if(auth!=null && auth.isAuthenticated() &&
                 !(auth instanceof AnonymousAuthenticationToken)){
 
-            Jwt jwt = (Jwt) auth.getPrincipal();
-            Long userId = jwt.getClaim("userId");
-
-            return new RateLimitIdentity(
-                    IdentityType.USER,
-                    String.valueOf(userId)
-            );
+            if (auth.getPrincipal() instanceof Jwt jwt) {
+                return new RateLimitIdentity(
+                        IdentityType.USER,
+                        jwt.getSubject()
+                );
+            }
         }
         return new RateLimitIdentity(
                 IdentityType.IP,

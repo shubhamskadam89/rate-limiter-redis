@@ -8,6 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * For learning purposes, this project includes a custom response wrapper.
@@ -24,18 +26,16 @@ public class CachedBodyHttpServletResponse extends HttpServletResponseWrapper {
 
     private PrintWriter writer;
 
-    public CachedBodyHttpServletResponse(HttpServletResponse response, ByteArrayOutputStream cachedContent) {
+    public CachedBodyHttpServletResponse(HttpServletResponse response) {
         super(response);
 
     }
-
-
     @Override
     public ServletOutputStream getOutputStream(){
 
         if(writer !=null){
             throw new IllegalStateException(
-                    "Writer already obtained."
+                    "getWriter() has already been called for this response"
             );
         }
         if(outputStream ==null){
@@ -48,15 +48,15 @@ public class CachedBodyHttpServletResponse extends HttpServletResponseWrapper {
 
     @Override
     public PrintWriter getWriter() throws IOException{
-        if(cachedContent != null){
+        if(outputStream != null){
             throw new IllegalStateException(
-                    "OutputStream already obtained."
+                    "getOutputStream() has already been called for this response"
             );
         }
 
         if(writer ==null){
             writer = new PrintWriter(
-                    new OutputStreamWriter(cachedContent,getCharacterEncoding())
+                    new OutputStreamWriter(cachedContent,resolveCharset())
             ,true
             );
         }
@@ -65,7 +65,22 @@ public class CachedBodyHttpServletResponse extends HttpServletResponseWrapper {
     }
 
     public String getCachedBody() throws IOException {
+        flushCachedBody();
+        return cachedContent.toString(resolveCharset());
 
+    }
+
+    public void copyBodyToResponse() throws IOException {
+        flushCachedBody();
+        HttpServletResponse originalResponse =
+                (HttpServletResponse) getResponse();
+
+        originalResponse.getOutputStream().write(cachedContent.toByteArray());
+
+        originalResponse.flushBuffer();
+    }
+
+    private void flushCachedBody() throws IOException {
         if (writer != null) {
             writer.flush();
         }
@@ -73,17 +88,15 @@ public class CachedBodyHttpServletResponse extends HttpServletResponseWrapper {
         if (outputStream != null) {
             outputStream.flush();
         }
-
-        return cachedContent.toString(getCharacterEncoding());
     }
 
-    public void copyBodyToResponse() throws IOException {
+    private Charset resolveCharset() {
+        String encoding = getCharacterEncoding();
 
-        HttpServletResponse response =
-                (HttpServletResponse) getResponse();
+        if (encoding == null || encoding.isBlank()) {
+            return StandardCharsets.UTF_8;
+        }
 
-        response.getOutputStream().write(cachedContent.toByteArray());
-
-        response.flushBuffer();
+        return Charset.forName(encoding);
     }
 }

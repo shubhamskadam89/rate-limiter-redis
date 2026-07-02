@@ -1,5 +1,6 @@
 package com.shubham.flashsale.idempotency.filter;
 
+import com.shubham.flashsale.common.web.CachedBodyHttpServletResponse;
 import com.shubham.flashsale.idempotency.IdempotencyRecord;
 import com.shubham.flashsale.idempotency.IdempotencyService;
 import com.shubham.flashsale.idempotency.IdempotencyState;
@@ -9,6 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,7 +45,8 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
             return;
         }
-        Optional<IdempotencyRecord> existing = idempotencyService.get(key);
+        String scopedKey = buildScopedKey(key);
+        Optional<IdempotencyRecord> existing = idempotencyService.get(scopedKey);
 
         if (existing.isPresent()) {
 
@@ -64,7 +70,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             }
         }
 
-        boolean acquired = idempotencyService.tryAcquire(key);
+        boolean acquired = idempotencyService.tryAcquire(scopedKey);
 
         if (!acquired) {
 
@@ -74,7 +80,35 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             return;
         }
 
-        filterChain.doFilter(request, response);
+        CachedBodyHttpServletResponse cachedResponse =
+                new CachedBodyHttpServletResponse(response);
+
+        try {
+            filterChain.doFilter(request, cachedResponse);
+
+            int statusCode = cachedResponse.getStatus();
+            String responseBody = cachedResponse.getCachedBody();
+
+            if (statusCode >= HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+                idempotencyService.release(scopedKey);
+            } else {
+                idempotencyService.complete(
+                        scopedKey,
+                        responseBody,
+                        statusCode
+                );
+            }
+
+            cachedResponse.copyBodyToResponse();
+
+        } catch (IOException | ServletException exception) {
+            idempotencyService.release(scopedKey);
+            throw exception;
+
+        } catch (RuntimeException exception) {
+            idempotencyService.release(scopedKey);
+            throw exception;
+        }
 
     }
 
@@ -89,4 +123,26 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         );
 
     }
+
+    private String buildScopedKey(String idempotencyKey) {
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+
+        if (authentication == null ||
+                !(authentication.getPrincipal() instanceof Jwt jwt)) {
+            throw new AccessDeniedException("Authenticated user not found");
+        }
+
+        String userUuid = jwt.getSubject();
+
+        if (userUuid == null || userUuid.isBlank()) {
+            throw new AccessDeniedException(
+                    "Authenticated user UUID is missing from token"
+            );
+        }
+
+        return userUuid + ":purchase:" + idempotencyKey;
+    }
+
+
 }
