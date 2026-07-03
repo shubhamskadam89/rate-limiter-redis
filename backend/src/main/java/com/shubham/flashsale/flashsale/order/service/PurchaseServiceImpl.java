@@ -1,13 +1,12 @@
 package com.shubham.flashsale.flashsale.order.service;
 
-import com.shubham.flashsale.common.CommonAuthService;
+import com.shubham.flashsale.common.service.CommonAuthService;
 import com.shubham.flashsale.exception.sale.SaleItemNotFoundException;
 import com.shubham.flashsale.flashsale.common.CommonFlashSaleService;
 import com.shubham.flashsale.flashsale.events.StockUpdateEvent;
 import com.shubham.flashsale.flashsale.events.StockUpdatePublisher;
 import com.shubham.flashsale.flashsale.order.dto.PurchaseRequest;
 import com.shubham.flashsale.flashsale.order.dto.PurchaseResponse;
-import com.shubham.flashsale.flashsale.order.entity.Order;
 import com.shubham.flashsale.flashsale.order.queue.OrderQueueMessage;
 import com.shubham.flashsale.flashsale.order.queue.OrderQueueProducer;
 import com.shubham.flashsale.flashsale.order.repository.OrderRepository;

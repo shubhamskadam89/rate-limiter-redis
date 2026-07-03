@@ -1,6 +1,6 @@
 package com.shubham.flashsale.flashsale.sale.service;
 
-import com.shubham.flashsale.common.CommonAuthService;
+import com.shubham.flashsale.common.service.CommonAuthService;
 import com.shubham.flashsale.common.redis.RedisKeyBuilder;
 import com.shubham.flashsale.exception.product.NoSuchProductException;
 import com.shubham.flashsale.exception.sale.DuplicateSaleItemException;

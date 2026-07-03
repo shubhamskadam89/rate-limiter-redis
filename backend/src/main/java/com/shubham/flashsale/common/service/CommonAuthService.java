@@ -1,4 +1,4 @@
-package com.shubham.flashsale.common;
+package com.shubham.flashsale.common.service;
 
 import com.shubham.flashsale.user.entity.User;
 import com.shubham.flashsale.user.repository.UserRepository;

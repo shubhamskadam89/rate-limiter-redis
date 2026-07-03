@@ -1,5 +1,6 @@
 package com.shubham.flashsale.flashsale.order.service;
 
+import com.shubham.flashsale.common.service.MetricsService;
 import com.shubham.flashsale.exception.sale.SaleItemNotFoundException;
 import com.shubham.flashsale.flashsale.order.entity.Order;
 import com.shubham.flashsale.flashsale.order.queue.OrderQueueMessage;
@@ -21,6 +22,7 @@ public class OrderPersistenceServiceImpl implements OrderPersistenceService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final SaleItemRepository saleItemRepository;
+    private final MetricsService metricsService;
 
 
     @Override
@@ -54,6 +56,8 @@ public class OrderPersistenceServiceImpl implements OrderPersistenceService {
         order.setUuid(message.getOrderUuid());
 
         Order savedOrder = orderRepository.save(order);
+        metricsService.incrementInventoryDecrement();
+
 
         log.info(
                 "Order persisted from queue. orderUuid={}, userUuid={}, saleItemUuid={}",

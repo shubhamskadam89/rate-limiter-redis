@@ -1,5 +1,6 @@
 package com.shubham.flashsale.flashsale.common;
 
+import com.shubham.flashsale.common.service.MetricsService;
 import com.shubham.flashsale.exception.purchase.PurchaseLimitExceededException;
 import com.shubham.flashsale.exception.purchase.PurchaseNotAllowedException;
 import com.shubham.flashsale.exception.purchase.SoldOutException;
@@ -34,7 +35,8 @@ import java.util.UUID;
 @Service
 public class CommonFlashSaleService {
 
-    OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final MetricsService metricsService;
 
     public SaleEvent validateSaleItemBelongsToSale(
             SaleItem saleItem,
@@ -127,6 +129,7 @@ public class CommonFlashSaleService {
     ) {
         BigDecimal unitPrice = saleItem.getSalePrice();
         BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+
 
         Order order = Order.builder()
                 .user(user)

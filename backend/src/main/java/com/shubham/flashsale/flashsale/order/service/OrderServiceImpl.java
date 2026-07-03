@@ -1,6 +1,6 @@
 package com.shubham.flashsale.flashsale.order.service;
 
-import com.shubham.flashsale.common.CommonAuthService;
+import com.shubham.flashsale.common.service.CommonAuthService;
 import com.shubham.flashsale.exception.purchase.OrderNotFoundException;
 import com.shubham.flashsale.flashsale.order.dto.OrderResponse;
 import com.shubham.flashsale.flashsale.order.entity.Order;

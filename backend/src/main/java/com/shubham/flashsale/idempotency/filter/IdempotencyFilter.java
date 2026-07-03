@@ -1,5 +1,6 @@
 package com.shubham.flashsale.idempotency.filter;
 
+import com.shubham.flashsale.common.service.MetricsService;
 import com.shubham.flashsale.common.web.CachedBodyHttpServletResponse;
 import com.shubham.flashsale.idempotency.IdempotencyRecord;
 import com.shubham.flashsale.idempotency.IdempotencyService;
@@ -27,6 +28,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
     private static final String IDEMPOTENCY_HEADER = "X-Idempotency-Key";
     private  final IdempotencyService idempotencyService;
+    private final MetricsService metricsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -49,7 +51,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         Optional<IdempotencyRecord> existing = idempotencyService.get(scopedKey);
 
         if (existing.isPresent()) {
-
+            metricsService.incrementIdempotencyHit();
             IdempotencyRecord record = existing.get();
 
             if (record.getState() == IdempotencyState.COMPLETED) {
