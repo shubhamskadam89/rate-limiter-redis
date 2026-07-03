@@ -1,5 +1,6 @@
 package com.shubham.flashsale.flashsale.sale.service;
 
+import com.shubham.flashsale.common.cache.CacheNames;
 import com.shubham.flashsale.common.service.CommonAuthService;
 import com.shubham.flashsale.common.redis.RedisKeyBuilder;
 import com.shubham.flashsale.exception.product.NoSuchProductException;
@@ -25,6 +26,9 @@ import com.shubham.flashsale.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -82,6 +86,13 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.SALE, key = "#saleUuid"),
+            @CacheEvict(cacheNames = CacheNames.SALE_DETAIL, key = "#saleUuid"),
+            @CacheEvict(cacheNames = CacheNames.ADMIN_SALES, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SALE_ITEMS, key = "#saleUuid"),
+            @CacheEvict(cacheNames = CacheNames.AVAILABLE_SALES, allEntries = true)
+    })
     public SaleItemResponse addItemToSale(String saleUuid, AddSaleItemRequest request) {
 
         log.debug("Adding item to sale saleId={} productId={}", saleUuid, request.getProductUuid());
@@ -144,6 +155,13 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.SALE, key = "#saleUuid"),
+            @CacheEvict(cacheNames = CacheNames.SALE_DETAIL, key = "#saleUuid"),
+            @CacheEvict(cacheNames = CacheNames.ADMIN_SALES, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SALE_ITEMS, key = "#saleUuid"),
+            @CacheEvict(cacheNames = CacheNames.AVAILABLE_SALES, allEntries = true)
+    })
     public SaleResponse activateSale(String saleUuid) {
         log.info("Activating sale saleUuid={}", saleUuid);
 
@@ -226,6 +244,10 @@ public class SaleServiceImpl implements SaleService {
 
 
     @Override
+    @Cacheable(
+            cacheNames = CacheNames.SALE,
+            key = "#saleUuid"
+    )
     public SaleResponse getSale(String saleUuid) {
         log.debug("getSale called saleId={}", saleUuid);
         SaleEvent saleEvent = saleEventRepository.findByUuid(saleUuid)
@@ -242,6 +264,10 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Cacheable(
+            cacheNames = CacheNames.SALE_DETAIL,
+            key = "#saleUuid"
+    )
     public SaleDetailResponse getSaleDetail(String saleUuid) {
         SaleEvent saleEvent = saleEventRepository.findByUuid(saleUuid)
                 .orElseThrow(() -> new SaleEventNotFoundException(saleUuid));
@@ -251,6 +277,9 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Cacheable(
+            cacheNames = CacheNames.ADMIN_SALES
+    )
     public List<SaleDetailResponse> getAdminSales() {
         User currentUser = commonAuthService.getCurrentUser();
 
@@ -269,6 +298,9 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Cacheable(
+            cacheNames = CacheNames.AVAILABLE_SALES
+    )
     public List<SaleDetailResponse> getAvailableSales() {
         return saleEventRepository.findByStatus(Status.ACTIVE)
                 .stream()
@@ -278,6 +310,10 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Cacheable(
+            cacheNames = CacheNames.SALE_ITEMS,
+            key = "#saleUuid"
+    )
     public List<SaleItemResponse> getSaleItems(String saleUuid) {
         SaleEvent saleEvent = saleEventRepository.findByUuid(saleUuid)
                 .orElseThrow(() -> new SaleEventNotFoundException(saleUuid));

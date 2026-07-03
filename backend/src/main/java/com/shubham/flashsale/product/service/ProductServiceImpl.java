@@ -1,5 +1,6 @@
 package com.shubham.flashsale.product.service;
 
+import com.shubham.flashsale.common.cache.CacheNames;
 import com.shubham.flashsale.exception.product.NoSuchProductException;
 import com.shubham.flashsale.product.dto.CreateProductRequest;
 import com.shubham.flashsale.product.dto.ProductResponse;
@@ -7,6 +8,8 @@ import com.shubham.flashsale.product.entity.Product;
 import com.shubham.flashsale.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +23,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.PRODUCTS, allEntries = true)
     public ProductResponse createProduct(
             CreateProductRequest request
     ) {
@@ -50,6 +54,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(
+            cacheNames = CacheNames.PRODUCT,
+            key = "#productUuid"
+    )
     public ProductResponse getProduct(
             String productUuid
     ) {
@@ -67,6 +75,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(
+            cacheNames = CacheNames.PRODUCTS
+    )
     public List<ProductResponse> getAllProducts() {
         log.debug("Fetching all products");
         return productRepository.findAll()

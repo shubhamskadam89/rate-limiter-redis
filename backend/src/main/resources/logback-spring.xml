@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="JSON_CONSOLE"
-              class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-
-        <appender-ref ref="JSON_STDOUT"/>
-
-    </appender>
-
-    <appender name="JSON_STDOUT"
-              class="ch.qos.logback.core.ConsoleAppender">
-
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-
-            <providers>
-
-                <timestamp/>
-
-                <logLevel/>
-
-                <threadName/>
-
-                <loggerName/>
-
-                <message/>
-
-                <mdc/>
-
-                <stackTrace/>
-
-            </providers>
-
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
-
     </appender>
 
-    <logger name="com.shubham.flashsale" level="DEBUG"/>
+
+
     <root level="INFO">
-        <appender-ref ref="JSON_CONSOLE"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 
 </configuration>

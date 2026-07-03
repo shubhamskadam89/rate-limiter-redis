@@ -1,6 +1,9 @@
 spring:
   application:
     name: flash-sale-engine
+  cache:
+    type: redis
+
 
   datasource:
     url: jdbc:mysql://localhost:3306/flash_sale_db?useSSL=false&allowPublicKeyRetrieval=true
@@ -9,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: validate
     properties:
