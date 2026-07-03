@@ -7,11 +7,13 @@ import com.shubham.flashsale.user.entity.UserRole;
 import com.shubham.flashsale.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -21,8 +23,10 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        log.info("Checking if database seeding is required");
 
         if (userRepository.count() == 0) {
+            log.info("Seeding default users (ADMIN, VIP, USER)");
 
             User admin = new User();
             admin.setEmail("admin@flashsale.com");
@@ -45,9 +49,11 @@ public class DataSeeder implements CommandLineRunner {
             userRepository.save(admin);
             userRepository.save(vip);
             userRepository.save(user);
+            log.info("Default users seeded successfully");
         }
 
         if (productRepository.count() == 0) {
+            log.info("Seeding default products (Gaming Mouse, Mechanical Keyboard)");
 
             Product mouse = new Product();
             mouse.setName("Gaming Mouse");
@@ -69,6 +75,8 @@ public class DataSeeder implements CommandLineRunner {
 
             productRepository.save(mouse);
             productRepository.save(keyboard);
+            log.info("Default products seeded successfully");
         }
+        log.info("Database seeding check completed");
     }
 }

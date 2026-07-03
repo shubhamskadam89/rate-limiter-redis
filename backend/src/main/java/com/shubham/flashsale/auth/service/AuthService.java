@@ -112,6 +112,7 @@ public class AuthService {
     public AuthResponse refresh(
             RefreshRequest request
     ){
+        log.info("Processing token refresh request");
         RefreshToken oldToken =
                 refreshTokenService.validateRefreshToken(
                         request.refreshToken()
@@ -129,6 +130,7 @@ public class AuthService {
                         new UserDetailsImpl(user)
                 );
 
+        log.info("Token refresh successful for user uuid={}", user.getUuid());
         return new AuthResponse(
                 accessToken,
                 newToken.getToken(),
@@ -141,6 +143,7 @@ public class AuthService {
     public void logout(
             RefreshRequest request
     ){
+        log.info("Processing user logout request");
         RefreshToken refreshToken =
                 refreshTokenService.validateRefreshToken(
                         request.refreshToken()
@@ -149,9 +152,11 @@ public class AuthService {
         refreshTokenService.revokeRefreshToken(
                 refreshToken
         );
+        log.info("User logout completed successfully");
     }
 
     public UserResponseDto getMe(){
+        log.debug("Fetching current user profile (getMe)");
         User user  = commonAuthService.getCurrentUser();
         UserResponseDto dto = new UserResponseDto(
                 UUID.fromString(user.getUuid()),

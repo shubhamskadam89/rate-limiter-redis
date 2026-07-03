@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="JSON_CONSOLE"
+              class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+
+        <appender-ref ref="JSON_STDOUT"/>
+
+    </appender>
+
+    <appender name="JSON_STDOUT"
+              class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+
+            <providers>
+
+                <timestamp/>
+
+                <logLevel/>
+
+                <threadName/>
+
+                <loggerName/>
+
+                <message/>
+
+                <mdc/>
+
+                <stackTrace/>
+
+            </providers>
+
+        </encoder>
+
+    </appender>
+
+    <logger name="com.shubham.flashsale" level="DEBUG"/>
+    <root level="INFO">
+        <appender-ref ref="JSON_CONSOLE"/>
+    </root>
+
+</configuration>

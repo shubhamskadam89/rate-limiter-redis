@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RateLimiterFilter extends OncePerRequestFilter {
@@ -30,12 +32,14 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 
         if(!result.allowed()){
 
+            log.warn("Rate limit breached for request URI={}, IP={}", request.getRequestURI(), request.getRemoteAddr());
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             metricsService.incrementRateLimitBreach();
             response.getWriter().write("Too many Requests");
             return;
         }
 
+        log.debug("Rate limit passed for URI={}", request.getRequestURI());
         filterChain.doFilter(request,response);
 
 

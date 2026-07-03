@@ -8,12 +8,14 @@ import com.shubham.flashsale.flashsale.order.repository.OrderRepository;
 import com.shubham.flashsale.user.entity.User;
 import com.shubham.flashsale.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -24,15 +26,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse getOrder(String uuid) {
-
+        log.debug("Fetching order by uuid={}", uuid);
         Order order = orderRepository.findByUuid(uuid)
-                .orElseThrow(() -> new OrderNotFoundException(uuid));
+                .orElseThrow(() -> {
+                    log.warn("Order not found with uuid={}", uuid);
+                    return new OrderNotFoundException(uuid);
+                });
 
         return toOrderResponse(order);
     }
 
     @Override
     public List<OrderResponse> getAllOrders() {
+        log.debug("Fetching all orders");
         return orderRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::toOrderResponse)
@@ -41,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getCurrentUserOrders() {
+        log.debug("Fetching orders for current user");
         User currentUser = commonAuthService.getCurrentUser();
 
         return orderRepository.findByUserOrderByCreatedAtDesc(currentUser)
@@ -51,8 +58,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getOrdersByUser(String userUuid) {
+        log.debug("Fetching orders for userUuid={}", userUuid);
         User user = userRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new OrderNotFoundException(userUuid));
+                .orElseThrow(() -> {
+                    log.warn("User not found when fetching orders for userUuid={}", userUuid);
+                    return new OrderNotFoundException(userUuid);
+                });
 
         return orderRepository.findByUserOrderByCreatedAtDesc(user)
                 .stream()

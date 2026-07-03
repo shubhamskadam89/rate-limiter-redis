@@ -4,12 +4,14 @@ import com.shubham.flashsale.common.redis.RedisKeyBuilder;
 import com.shubham.flashsale.ratelimit.*;
 import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenBucketStrategy  implements RateLimitingStrategy {
@@ -33,8 +35,9 @@ public class TokenBucketStrategy  implements RateLimitingStrategy {
                         String.valueOf(properties.getRefillRate()),
                         String.valueOf(System.currentTimeMillis())
                 );
-        System.out.println("RESULT = " + result);
+        log.debug("Token bucket lua script result: {} for key: {}", result, key);
         if(result==null || result.size()<2){
+            log.error("Token bucket Lua script returned invalid result for key={}", key);
             throw new IllegalStateException(
                     "Lua script returned invalid result"
             );

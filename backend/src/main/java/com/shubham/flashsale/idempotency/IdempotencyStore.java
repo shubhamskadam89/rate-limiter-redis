@@ -4,12 +4,14 @@ package com.shubham.flashsale.idempotency;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class IdempotencyStore {
@@ -70,6 +72,7 @@ public class IdempotencyStore {
         try{
             return objectMapper.writeValueAsString(record);
         } catch (JsonProcessingException e) {
+            log.error("Failed to serialize idempotency record", e);
             throw new RuntimeException("Failed to serialize idempotency record",e);
         }
     }
@@ -78,6 +81,7 @@ public class IdempotencyStore {
         try {
             return objectMapper.readValue(json, IdempotencyRecord.class);
         } catch (JsonProcessingException e) {
+            log.error("Failed to deserialize idempotency record for json={}", json, e);
             throw new RuntimeException("Failed to deserialize idempotency record", e);
         }
     }

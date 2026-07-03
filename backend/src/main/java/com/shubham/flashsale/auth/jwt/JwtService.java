@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -21,6 +23,7 @@ public class JwtService {
         Instant now = Instant.now();
         UserDetailsImpl userDetails =
                 (UserDetailsImpl) principal;
+        log.debug("Generating JWT token for user uuid={}", userDetails.user().getUuid());
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .subject(userDetails.user().getUuid())
                 .claim("role",userDetails.user().getRole().name())
@@ -33,6 +36,7 @@ public class JwtService {
     }
 
     public String extractUserUuid(String token) {
+        log.debug("Extracting user UUID from JWT token");
         return jwtDecoder.decode(token).getSubject();
     }
 
@@ -41,6 +45,8 @@ public class JwtService {
 
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
 
-        return jwt.getSubject().equals(userDetailsImpl.user().getUuid());
+        boolean valid = jwt.getSubject().equals(userDetailsImpl.user().getUuid());
+        log.debug("Validated JWT token for user uuid={}, valid={}", userDetailsImpl.user().getUuid(), valid);
+        return valid;
     }
 }

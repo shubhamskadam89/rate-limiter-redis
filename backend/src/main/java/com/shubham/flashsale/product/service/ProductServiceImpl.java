@@ -53,11 +53,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProduct(
             String productUuid
     ) {
-
+        log.debug("Fetching product by uuid={}", productUuid);
         Product product =
                 productRepository.findByUuid(productUuid)
                         .orElseThrow(
-                                () -> new NoSuchProductException(productUuid)
+                                () -> {
+                                    log.warn("Product not found with uuid={}", productUuid);
+                                    return new NoSuchProductException(productUuid);
+                                }
                         );
 
         return mapToResponse(product);
@@ -65,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getAllProducts() {
-
+        log.debug("Fetching all products");
         return productRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)

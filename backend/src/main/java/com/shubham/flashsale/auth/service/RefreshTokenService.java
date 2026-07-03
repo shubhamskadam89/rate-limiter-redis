@@ -7,11 +7,13 @@ import com.shubham.flashsale.exception.security.RefreshTokenNotFoundException;
 import com.shubham.flashsale.exception.security.RefreshTokenRevokedException;
 import com.shubham.flashsale.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
@@ -21,6 +23,8 @@ public class RefreshTokenService {
     private static final long REFRESH_TOKEN_DAYS = 30;
 
     public RefreshToken createRefreshToken(User user) {
+
+        log.info("Creating refresh token for user uuid={}", user.getUuid());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
@@ -32,7 +36,9 @@ public class RefreshTokenService {
                 .isRevoked(false)
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        RefreshToken saved = refreshTokenRepository.save(refreshToken);
+        log.debug("Refresh token created successfully id={}", saved.getId());
+        return saved;
     }
     public RefreshToken validateRefreshToken(String token) {
 
@@ -44,19 +50,23 @@ public class RefreshTokenService {
                         );
 
         if(Boolean.TRUE.equals(refreshToken.getIsRevoked())){
+            log.warn("Validation failed: Refresh token is revoked for token={}", token);
             throw new RefreshTokenRevokedException();
         }
 
         if(refreshToken.getExpiresAt()
                 .isBefore(LocalDateTime.now())){
+            log.warn("Validation failed: Refresh token is expired for token={}", token);
             throw new RefreshTokenExpiredException();
         }
 
+        log.debug("Refresh token validated successfully for user uuid={}", refreshToken.getUser().getUuid());
         return refreshToken;
     }
     public void revokeRefreshToken(
             RefreshToken refreshToken
     ){
+        log.info("Revoking refresh token id={}", refreshToken.getId());
         refreshToken.setIsRevoked(true);
 
         refreshTokenRepository.save(refreshToken);
@@ -64,6 +74,7 @@ public class RefreshTokenService {
     public RefreshToken rotateRefreshToken(
             RefreshToken oldToken
     ){
+        log.info("Rotating refresh token id={}", oldToken.getId());
 
         revokeRefreshToken(oldToken);
 

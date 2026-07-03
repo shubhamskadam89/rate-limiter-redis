@@ -17,10 +17,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @Order(2)
@@ -40,6 +42,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
         if (key == null || key.isBlank()) {
 
+            log.warn("Missing X-Idempotency-Key header for URI={}", request.getRequestURI());
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
                     "Missing X-Idempotency-Key header"
@@ -56,6 +59,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
             if (record.getState() == IdempotencyState.COMPLETED) {
 
+                log.info("Idempotency cache hit (COMPLETED) for scopedKey={}", scopedKey);
                 response.setStatus(record.getStatusCode());
                 response.setContentType("application/json");
                 response.getWriter().write(record.getResponseBody());
@@ -65,6 +69,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
             if (record.getState() == IdempotencyState.PROCESSING) {
 
+                log.info("Idempotency cache hit (PROCESSING) for scopedKey={}", scopedKey);
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 response.getWriter().write("Request already being processed.");
 
@@ -76,6 +81,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
 
         if (!acquired) {
 
+            log.warn("Failed to acquire idempotency lock for scopedKey={}", scopedKey);
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
             response.getWriter().write("Request already being processed.");
 

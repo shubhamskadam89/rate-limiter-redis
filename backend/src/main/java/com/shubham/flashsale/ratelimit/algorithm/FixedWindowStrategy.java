@@ -6,11 +6,13 @@ import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
 import com.shubham.flashsale.common.redis.RedisKeyBuilder;
 import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FixedWindowStrategy implements RateLimitingStrategy {
@@ -32,6 +34,7 @@ public class FixedWindowStrategy implements RateLimitingStrategy {
                 .increment(key);
 
         if(count==null){
+            log.error("Redis increment failed for key={}", key);
             throw new IllegalStateException("Redis increment failed");
         }
 
@@ -43,6 +46,8 @@ public class FixedWindowStrategy implements RateLimitingStrategy {
                 rateLimitProperties.getMaxRequests()-count);
 
         boolean allowed  = count<= rateLimitProperties.getMaxRequests();
+
+        log.debug("Fixed window rate limit check for key={}, count={}, allowed={}", key, count, allowed);
 
         return new RateLimitResult(allowed,
                 count,

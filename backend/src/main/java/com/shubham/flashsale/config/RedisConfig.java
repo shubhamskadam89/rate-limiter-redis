@@ -11,7 +11,9 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 public class RedisConfig {
 
@@ -51,7 +53,7 @@ public class RedisConfig {
                     .opsForValue()
                     .set("hello", "world");
 
-            System.out.println("Redis Test Success");
+            log.info("Redis Test Success");
         };
     }
 

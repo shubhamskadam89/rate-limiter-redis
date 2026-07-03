@@ -8,9 +8,11 @@ import com.shubham.flashsale.ratelimit.identity.IdentityResolver;
 import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RateLimiterService {
@@ -24,7 +26,7 @@ public class RateLimiterService {
     public RateLimitResult checkLimit(HttpServletRequest request) {
 
         RateLimitIdentity identifier = identityResolver.resolve(request);
-        System.out.println(identifier);
+        log.debug("Checking rate limit for identifier: {}", identifier);
 
         return switch (properties.getAlgorithm()) {
 

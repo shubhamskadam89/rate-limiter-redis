@@ -6,6 +6,7 @@ import com.shubham.flashsale.ratelimit.RateLimitingStrategy;
 import com.shubham.flashsale.common.redis.RedisKeyBuilder;
 import com.shubham.flashsale.ratelimit.identity.RateLimitIdentity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SlidingWindowStrategy implements RateLimitingStrategy {
@@ -50,6 +52,7 @@ public class SlidingWindowStrategy implements RateLimitingStrategy {
         );
 
         if (result == null || result.size() < 2) {
+            log.error("Sliding window Lua script returned invalid result for key={}", key);
             throw new IllegalStateException("Lua script returned invalid result");
         }
 
@@ -58,6 +61,8 @@ public class SlidingWindowStrategy implements RateLimitingStrategy {
 
         long remaining = Math.max(0, properties.getMaxRequests() - count);
         boolean allowed = allowedVal == 1;
+
+        log.debug("Sliding window check key={}, allowed={}, count={}", key, allowed, count);
 
         return new RateLimitResult(
                 allowed,
