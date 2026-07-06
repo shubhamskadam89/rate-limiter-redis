@@ -1,14 +1,17 @@
 spring:
+
   application:
     name: flash-sale-engine
+    admin:
+      enabled:
   cache:
     type: redis
 
 
   datasource:
-    url: jdbc:mysql://localhost:3306/flash_sale_db?useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:flash_sale_db}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -24,8 +27,8 @@ spring:
 
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
       lettuce:
         pool:
@@ -59,23 +62,22 @@ ratelimit:
       burst: 200
 
 jwt:
-  secret: ${JWT_SECRET:dGhpcy1pcy1hLXNhbXBsZS1kZXZlbG9wbWVudC1zZWNyZXQta2V5LXdoY2gtaXMtbG9uZy1lbm91Z2g=}
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,metrics,prometheus"
   endpoint:
     health:
       show-details: always
-  metrics:
-    tags:
-      application: "flash-sale-engine"
-    distribution:
-      percentiles-histogram:
-        http:
-          server:
-            requests: true
+      probes:
+        enabled: true
 
+  health:
+    livenessstate:
+      enabled: true
+
+    readinessstate:
+      enabled: true
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}

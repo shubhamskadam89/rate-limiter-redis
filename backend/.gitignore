@@ -90,3 +90,11 @@ jacoco.exec
 *.pid
 *.seed
 *.pid.lock
+
+
+.git
+.gitignore
+
+.idea/
+README.md
+Dockerfile
