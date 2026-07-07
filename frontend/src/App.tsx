@@ -17,7 +17,7 @@ export function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      {import.meta.env.DEV ? <Route path="/setup/register" element={<SetupRegisterPage />} /> : null}
+      <Route path="/setup/register" element={<Navigate to="/login?tab=register" replace />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route index element={<Navigate to="/purchase" replace />} />

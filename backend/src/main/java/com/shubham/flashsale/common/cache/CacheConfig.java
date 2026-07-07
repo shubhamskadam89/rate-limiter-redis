@@ -23,7 +23,7 @@ public class CacheConfig {
         ObjectMapper cacheObjectMapper = objectMapper.copy();
         cacheObjectMapper.activateDefaultTyping(
                 com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
         );
 

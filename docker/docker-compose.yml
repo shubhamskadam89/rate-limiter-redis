@@ -21,6 +21,7 @@ services:
     environment:
       DB_HOST: mysql
       REDIS_HOST: redis
+      TZ: Asia/Kolkata
 
     depends_on:
       mysql:
@@ -47,6 +48,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      TZ: Asia/Kolkata
 
     ports:
       - "${DB_PORT}:${DB_PORT}"
@@ -107,7 +109,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "3000:3000"
+      - "3010:3000"
 
     environment:
       GF_SECURITY_ADMIN_USER: admin

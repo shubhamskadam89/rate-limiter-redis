@@ -11,6 +11,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -20,11 +21,16 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret; // REQUIRED FOR ENCODER
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec; // FIXED: Missing import
 import java.nio.charset.StandardCharsets; // FIXED: Missing import
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -32,6 +38,7 @@ public class SecurityConfig {
 
     private final JwtProperties jwtProperties;
     private final CustomUserDetailsService customUserDetailsService; // Inject explicitly
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -50,14 +57,33 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("role");
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+
+        JwtAuthenticationConverter converter =
+                new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+
+            String role = jwt.getClaimAsString("role");
+
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_" + role)
+            );
+        });
+
+        return converter;
     }
 
     @Bean

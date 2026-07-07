@@ -20,7 +20,7 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
   flyway:
     enabled: true
@@ -49,6 +49,7 @@ ratelimit:
       requests: 10
       window: 60
       burst: 20
+      refill: 0.1667
 
     GENERAL:
       algorithm: FIXED_WINDOW
@@ -60,9 +61,10 @@ ratelimit:
       requests: 100
       window: 60
       burst: 200
+      refill: 1.6667
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:dGhpcy1pcy1hLXNhbXBsZS1kZXZlbG9wbWVudC1zZWNyZXQta2V5LXdoY2gtaXMtbG9uZy1lbm91Z2g=}
   expiration: 86400000
 
 management:

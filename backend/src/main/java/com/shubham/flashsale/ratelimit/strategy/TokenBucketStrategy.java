@@ -33,12 +33,16 @@ public class TokenBucketStrategy  implements RateLimitingStrategy {
                         identity.key()
                 );
 
+        double refill = configuration.getRefill() != null ? 
+                configuration.getRefill() : 
+                (double) configuration.getRequests() / configuration.getWindow();
+
         List<?> result =
                 redisTemplate.execute(
                         tokenBucketScript,
                         List.of(key),
                         String.valueOf(configuration.getBurst()),
-                        String.valueOf(configuration.getRefill()),
+                        String.valueOf(refill),
                         String.valueOf(System.currentTimeMillis())
                 );
         log.debug("Token bucket lua script result: {} for key: {}", result, key);
