@@ -68,6 +68,10 @@ jwt:
   expiration: 86400000
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
   endpoint:
     health:
       show-details: always
