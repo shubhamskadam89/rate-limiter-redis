@@ -2,6 +2,23 @@ name: flash-sale-engine
 
 services:
 
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+
+    image: flash-sale-frontend:latest
+    container_name: flash-sale-frontend
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
   backend:
     build:
       context: ../backend
@@ -117,6 +134,8 @@ services:
 
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
 
     depends_on:
       prometheus:
