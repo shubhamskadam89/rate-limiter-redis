@@ -50,6 +50,10 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.ADMIN_SALES, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.AVAILABLE_SALES, allEntries = true)
+    })
     public SaleResponse createSale(CreateSaleRequest request) {
 
         log.debug("Validating sale request name={} startTime={} endTime={}",

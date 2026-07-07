@@ -41,3 +41,4 @@ variables:
   ecDraftSaleEnd: ""
   ecDraftSaleUuid: ""
   ecDraftSaleItemUuid: ""
+  saleName: ""
