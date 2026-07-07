@@ -1,3 +1,4 @@
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LogIn, UserPlus, Copy, Check, Zap, Cpu, Database, Activity } from "lucide-react";
 import { useState } from "react";
@@ -94,8 +95,8 @@ export function LoginPage() {
       let res;
       try {
         res = await registerSetupUser(values);
-      } catch (err: any) {
-        if (err?.response?.status === 404 || err?.status === 404) {
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && (err.response?.status === 404 || err.status === 404)) {
           res = await registerUser(values);
         } else {
           throw err;

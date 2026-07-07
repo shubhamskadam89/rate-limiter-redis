@@ -10,7 +10,6 @@ import { OrderLookupPage } from "./pages/OrderLookupPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { PurchasePage } from "./pages/PurchasePage";
-import { SetupRegisterPage } from "./pages/SetupRegisterPage";
 import { UnauthorizedPage } from "./pages/UnauthorizedPage";
 
 export function App() {
