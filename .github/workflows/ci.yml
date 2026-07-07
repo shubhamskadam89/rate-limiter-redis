@@ -14,7 +14,7 @@ on:
 jobs:
 
   backend:
-    name : Backend Build & Lint
+    name: Backend Build & Test
     runs-on: ubuntu-latest
 
     services:
@@ -93,7 +93,7 @@ jobs:
           retention-days: 7
 
   frontend:
-     name : Backend Build & Lint
+    name: Frontend Build & Lint
 
     runs-on: ubuntu-latest
 
