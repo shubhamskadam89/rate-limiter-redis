@@ -137,6 +137,20 @@ services:
     networks:
       - flash-sale-network
 
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: flash-sale-redis-exporter
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    ports:
+      - "9121:9121"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - flash-sale-network
+
   prometheus:
     image: prom/prometheus:latest
     container_name: flash-sale-prometheus
