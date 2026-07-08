@@ -71,7 +71,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, prometheus
+        include: health, prometheus, metrics
   endpoint:
     health:
       show-details: always
@@ -84,6 +84,15 @@ management:
 
     readinessstate:
       enabled: true
+
+  metrics:
+    enable:
+      jvm: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true   # enables p50/p99 histogram buckets for API latency panel
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}

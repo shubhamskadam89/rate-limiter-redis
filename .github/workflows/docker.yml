@@ -1,11 +1,9 @@
-name: Docker Validation
+name: Docker Validation & Publish
 
 on:
   push:
     branches:
       - main
-      - feature/**
-      - ops/**
 
   pull_request:
     branches:
@@ -67,9 +65,63 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare Environment
-        working-directory: docker
-        run: cp ../.env.example ../.env
+        run: cp .env.example .env
 
-      - name: Validate Docker Compose Configuration
+      - name: Validate dev compose (docker/)
         working-directory: docker
         run: docker compose config
+
+      - name: Validate quick-start compose (root)
+        run: docker compose config
+
+  publish:
+    name: Publish to Docker Hub
+    runs-on: ubuntu-latest
+
+    # Only publish on pushes to main — not on PRs or feature branches
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    needs:
+      - backend-image
+      - frontend-image
+      - compose-validation
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract short SHA
+        id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/flash-sale-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/flash-sale-backend:${{ steps.sha.outputs.short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/flash-sale-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/flash-sale-frontend:${{ steps.sha.outputs.short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
