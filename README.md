@@ -119,3 +119,20 @@ flowchart TD
 
 > 📖 Full request-lifecycle sequence diagrams, deployment topology, and architectural decisions live in [docs/architecture.md](docs/architecture.md).
 
+## Demo
+
+The following screenshots demonstrate the core workflows implemented in the project.
+
+| Authentication | Purchase Workspace |
+|----------------|--------------------|
+| <img src="https://github.com/user-attachments/assets/d0ae93df-bc6a-41c9-9c20-52a2a4bf3571" alt="Authentication" width="500" /> | <img src="https://github.com/user-attachments/assets/7313173e-1ce1-44a4-b68b-0c090c5b1db3" alt="Purchase Workspace" width="500" /> |
+
+| Administration | Rate Limiting |
+|---------------|---------------|
+| <img width="500"  alt="Sale_Console" src="https://github.com/user-attachments/assets/79843cc1-668e-411f-ab29-f4e7457fbfcc" />| <img width="500"  alt="Purchase" src="https://github.com/user-attachments/assets/9ffb9fec-9b0b-46bc-99cd-4fc4e5d7ae2a" />|
+
+| Observability | Continuous Integration |
+|---------------|------------------------|
+| <img width="500" alt="dashboard-grafana" src="https://github.com/user-attachments/assets/95c144b0-ed4a-4ae0-932a-10474d04edb7" />| <img width="500"  alt="github_actions_workflows_rate-limiter-redis_08-07-26" src="https://github.com/user-attachments/assets/e1dacdba-a906-48d2-b473-6e2426b99ff2" />
+ |
+
