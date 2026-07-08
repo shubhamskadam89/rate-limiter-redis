@@ -10,31 +10,30 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @Table(
-        name = "users",
-        indexes = {
-                @Index(name = "idx_email", columnList = "email"),
-                @Index(name = "idx_uuid", columnList = "uuid"),
-                @Index(name = "idx_deleted_at", columnList = "deleted_at")
-        }
-)
+    name = "users",
+    indexes = {
+      @Index(name = "idx_email", columnList = "email"),
+      @Index(name = "idx_uuid", columnList = "uuid"),
+      @Index(name = "idx_deleted_at", columnList = "deleted_at")
+    })
 @AllArgsConstructor
 public class User extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
-    private String email;
+  @Column(nullable = false, unique = true)
+  private String email;
 
-    @Column(nullable = false,name = "full_name")
-    private String fullName;
+  @Column(nullable = false, name = "full_name")
+  private String fullName;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+  @Column(name = "password_hash", nullable = false)
+  private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private UserRole role = UserRole.USER;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  @Builder.Default
+  private UserRole role = UserRole.USER;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean isActive = true;
+  @Column(nullable = false)
+  @Builder.Default
+  private Boolean isActive = true;
 }

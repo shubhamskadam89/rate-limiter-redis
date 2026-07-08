@@ -1,15 +1,9 @@
 package com.shubham.flashsale.exception.product;
 
-public class NoSuchProductException
-        extends RuntimeException {
+public class NoSuchProductException extends RuntimeException {
 
-    public NoSuchProductException(
-            String productUuid
-    ) {
+  public NoSuchProductException(String productUuid) {
 
-        super(
-                "Product not found: " +
-                        productUuid
-        );
-    }
+    super("Product not found: " + productUuid);
+  }
 }

@@ -11,12 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IdempotencyRecord {
 
-    private IdempotencyState state;
+  private IdempotencyState state;
 
+  private String responseBody;
 
-    private String responseBody;
-
-    private int statusCode;
-
-
+  private int statusCode;
 }

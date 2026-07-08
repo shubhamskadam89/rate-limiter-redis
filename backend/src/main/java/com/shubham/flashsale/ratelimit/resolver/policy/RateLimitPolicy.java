@@ -1,13 +1,13 @@
 package com.shubham.flashsale.ratelimit.resolver.policy;
 
 public enum RateLimitPolicy {
-    AUTH,
+  AUTH,
 
-    TRANSACTION,
+  TRANSACTION,
 
-    GENERAL,
+  GENERAL,
 
-    ADMIN,
+  ADMIN,
 
-    INTERNAL
+  INTERNAL
 }

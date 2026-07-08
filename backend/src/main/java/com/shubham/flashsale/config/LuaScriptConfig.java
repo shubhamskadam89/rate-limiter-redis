@@ -1,43 +1,39 @@
 package com.shubham.flashsale.config;
 
-
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
-import java.util.List;
-
 @Configuration
 public class LuaScriptConfig {
 
-    @Bean
-    public RedisScript<List> tokenBucketScript(){
+  @Bean
+  public RedisScript<List> tokenBucketScript() {
 
-        DefaultRedisScript<List> script =
-            new DefaultRedisScript<>();
+    DefaultRedisScript<List> script = new DefaultRedisScript<>();
 
-        script.setLocation(
-                new ClassPathResource("scripts/lua/token_bucket.lua"));
+    script.setLocation(new ClassPathResource("scripts/lua/token_bucket.lua"));
 
-        script.setResultType(List.class);
-        return script;
-    }
+    script.setResultType(List.class);
+    return script;
+  }
 
-    @Bean
-    public RedisScript<List> flashSalePurchaseScript() {
-        DefaultRedisScript<List> script = new DefaultRedisScript<>();
-        script.setLocation(new ClassPathResource("scripts/lua/flash_sale_purchase.lua"));
-        script.setResultType(List.class);
-        return script;
-    }
+  @Bean
+  public RedisScript<List> flashSalePurchaseScript() {
+    DefaultRedisScript<List> script = new DefaultRedisScript<>();
+    script.setLocation(new ClassPathResource("scripts/lua/flash_sale_purchase.lua"));
+    script.setResultType(List.class);
+    return script;
+  }
 
-    @Bean
-    public RedisScript<List> slidingWindowScript() {
-        DefaultRedisScript<List> script = new DefaultRedisScript<>();
-        script.setLocation(new ClassPathResource("scripts/lua/sliding_window.lua"));
-        script.setResultType(List.class);
-        return script;
-    }
+  @Bean
+  public RedisScript<List> slidingWindowScript() {
+    DefaultRedisScript<List> script = new DefaultRedisScript<>();
+    script.setLocation(new ClassPathResource("scripts/lua/sliding_window.lua"));
+    script.setResultType(List.class);
+    return script;
+  }
 }

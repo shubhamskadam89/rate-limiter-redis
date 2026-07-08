@@ -1,8 +1,7 @@
 package com.shubham.flashsale.flashsale.order.dto;
 
-import lombok.*;
-
 import java.util.UUID;
+import lombok.*;
 
 @Data
 @Builder
@@ -10,16 +9,15 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PurchaseResponse {
 
-    UUID orderUuid;
+  UUID orderUuid;
 
-    UUID saleItemUuid;
+  UUID saleItemUuid;
 
-    UUID productUuid;
+  UUID productUuid;
 
-    private Integer quantity;
+  private Integer quantity;
 
-    private Integer remainingInventory;
+  private Integer remainingInventory;
 
-    private String message;
-
+  private String message;
 }

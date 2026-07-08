@@ -9,22 +9,25 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class MetricsConfig {
 
-    private final Counter rateLimitBreachesCounter;
-    private final Counter inventoryDecrementsCounter;
-    private final Counter idempotencyHitsCounter;
+  private final Counter rateLimitBreachesCounter;
+  private final Counter inventoryDecrementsCounter;
+  private final Counter idempotencyHitsCounter;
 
-    public MetricsConfig(MeterRegistry meterRegistry) {
+  public MetricsConfig(MeterRegistry meterRegistry) {
 
-        this.rateLimitBreachesCounter = Counter.builder("rate_limit_breaches_total")
-                .description("Total number of rate limit violations")
-                .register(meterRegistry);
+    this.rateLimitBreachesCounter =
+        Counter.builder("rate_limit_breaches_total")
+            .description("Total number of rate limit violations")
+            .register(meterRegistry);
 
-        this.inventoryDecrementsCounter = Counter.builder("inventory_decrements_total")
-                .description("Total successful inventory decrements")
-                .register(meterRegistry);
+    this.inventoryDecrementsCounter =
+        Counter.builder("inventory_decrements_total")
+            .description("Total successful inventory decrements")
+            .register(meterRegistry);
 
-        this.idempotencyHitsCounter = Counter.builder("idempotency_hits_total")
-                .description("Total duplicate requests served from idempotency cache")
-                .register(meterRegistry);
-    }
+    this.idempotencyHitsCounter =
+        Counter.builder("idempotency_hits_total")
+            .description("Total duplicate requests served from idempotency cache")
+            .register(meterRegistry);
+  }
 }

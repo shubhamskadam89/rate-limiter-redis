@@ -1,9 +1,8 @@
 package com.shubham.flashsale.flashsale.sale.dto;
 
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.*;
 
 @Getter
 @Setter
@@ -12,20 +11,19 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SaleItemResponse {
 
+  private UUID saleItemUuid;
 
-    private UUID saleItemUuid;
+  private UUID saleEventUuid;
 
-    private UUID saleEventUuid;
+  private UUID productUuid;
 
-    private UUID productUuid;
+  private String productName;
 
-    private String productName;
+  private BigDecimal salePrice;
 
-    private BigDecimal salePrice;
+  private Long inventory;
 
-    private Long inventory;
+  private Long finalCount;
 
-    private Long finalCount;
-
-    private Integer maxPerUser;
+  private Integer maxPerUser;
 }

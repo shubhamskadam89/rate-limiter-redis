@@ -15,26 +15,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CommonAuthService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    public User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
+  public User getCurrentUser() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Object principal = authentication.getPrincipal();
 
-        // Spring's oauth2ResourceServer sets the principal as a Jwt token, NOT UserDetailsImpl.
-        // We extract the subject claim (which is the user's email) and load the User from the DB.
-        if (!(principal instanceof Jwt jwt)) {
-            log.error("Principal is not a Jwt token. type={}", principal.getClass().getName());
-            throw new AccessDeniedException("Authenticated user not found");
-        }
-
-        String uuid = jwt.getSubject();
-        log.debug("Resolved current user id={} from JWT subject", uuid);
-
-        return userRepository.findByUuid(uuid)
-                .orElseThrow(() -> {
-                    log.error("No user found in DB for JWT subject uuid={}", uuid);
-                    return new AccessDeniedException("User not found: " + uuid);
-                });
+    // Spring's oauth2ResourceServer sets the principal as a Jwt token, NOT UserDetailsImpl.
+    // We extract the subject claim (which is the user's email) and load the User from the DB.
+    if (!(principal instanceof Jwt jwt)) {
+      log.error("Principal is not a Jwt token. type={}", principal.getClass().getName());
+      throw new AccessDeniedException("Authenticated user not found");
     }
+
+    String uuid = jwt.getSubject();
+    log.debug("Resolved current user id={} from JWT subject", uuid);
+
+    return userRepository
+        .findByUuid(uuid)
+        .orElseThrow(
+            () -> {
+              log.error("No user found in DB for JWT subject uuid={}", uuid);
+              return new AccessDeniedException("User not found: " + uuid);
+            });
+  }
 }

@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MetricsService {
 
-    private final MetricsConfig metricsConfig;
+  private final MetricsConfig metricsConfig;
 
-    public void incrementRateLimitBreach() {
-        log.debug("Incrementing rate limit breach metric");
-        metricsConfig.getRateLimitBreachesCounter().increment();
-    }
+  public void incrementRateLimitBreach() {
+    log.debug("Incrementing rate limit breach metric");
+    metricsConfig.getRateLimitBreachesCounter().increment();
+  }
 
-    public void incrementInventoryDecrement() {
-        log.debug("Incrementing inventory decrement metric");
-        metricsConfig.getInventoryDecrementsCounter().increment();
-    }
+  public void incrementInventoryDecrement() {
+    log.debug("Incrementing inventory decrement metric");
+    metricsConfig.getInventoryDecrementsCounter().increment();
+  }
 
-    public void incrementIdempotencyHit() {
-        log.debug("Incrementing idempotency hit metric");
-        metricsConfig.getIdempotencyHitsCounter().increment();
-    }
+  public void incrementIdempotencyHit() {
+    log.debug("Incrementing idempotency hit metric");
+    metricsConfig.getIdempotencyHitsCounter().increment();
+  }
 }

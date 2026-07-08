@@ -9,9 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 public class StockUpdateEvent {
 
-    private String saleUuid;
+  private String saleUuid;
 
-    private String saleItemUuid;
+  private String saleItemUuid;
 
-    private Integer remainingInventory;
+  private Integer remainingInventory;
 }

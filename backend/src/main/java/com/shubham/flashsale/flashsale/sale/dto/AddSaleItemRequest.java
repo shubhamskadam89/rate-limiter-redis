@@ -1,8 +1,7 @@
 package com.shubham.flashsale.flashsale.sale.dto;
 
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,11 +9,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddSaleItemRequest {
-    private String productUuid;
+  private String productUuid;
 
-    private BigDecimal salePrice;
+  private BigDecimal salePrice;
 
-    private Long inventory;
+  private Long inventory;
 
-    private Integer maxPerUser;
+  private Integer maxPerUser;
 }

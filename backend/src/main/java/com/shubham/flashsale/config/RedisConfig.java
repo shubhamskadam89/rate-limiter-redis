@@ -1,6 +1,7 @@
 package com.shubham.flashsale.config;
 
 import com.shubham.flashsale.flashsale.events.sse.StockUpdateSubscriber;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,66 +12,55 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 public class RedisConfig {
 
-    @Bean
-    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory){
-        return new StringRedisTemplate(connectionFactory);
-    }
+  @Bean
+  public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
+    return new StringRedisTemplate(connectionFactory);
+  }
 
-    @Bean
-    public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory factory){
-        RedisTemplate<String,Object> redisTemplate = new RedisTemplate<>();
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+    RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 
-        redisTemplate.setConnectionFactory(factory);
+    redisTemplate.setConnectionFactory(factory);
 
-        StringRedisSerializer keySerializer = new StringRedisSerializer();
+    StringRedisSerializer keySerializer = new StringRedisSerializer();
 
-        GenericJackson2JsonRedisSerializer valueSerializer =
-                new GenericJackson2JsonRedisSerializer();
+    GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
 
-        redisTemplate.setKeySerializer(keySerializer);
-        redisTemplate.setHashKeySerializer(keySerializer);
+    redisTemplate.setKeySerializer(keySerializer);
+    redisTemplate.setHashKeySerializer(keySerializer);
 
-        redisTemplate.setValueSerializer(valueSerializer);
-        redisTemplate.setHashValueSerializer(valueSerializer);
+    redisTemplate.setValueSerializer(valueSerializer);
+    redisTemplate.setHashValueSerializer(valueSerializer);
 
-        return redisTemplate;
-    }
+    return redisTemplate;
+  }
 
-    @Bean
-    CommandLineRunner testRedis(
-            StringRedisTemplate stringRedisTemplate
-    ) {
+  @Bean
+  CommandLineRunner testRedis(StringRedisTemplate stringRedisTemplate) {
 
-        return args -> {
+    return args -> {
+      stringRedisTemplate.opsForValue().set("hello", "world");
 
-            stringRedisTemplate
-                    .opsForValue()
-                    .set("hello", "world");
+      log.info("Redis Test Success");
+    };
+  }
 
-            log.info("Redis Test Success");
-        };
-    }
+  @Bean
+  public RedisMessageListenerContainer redisMessageListenerContainer(
+      RedisConnectionFactory connectionFactory, StockUpdateSubscriber stockUpdateSubscriber) {
+    RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+    container.setConnectionFactory(connectionFactory);
 
-    @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(
-            RedisConnectionFactory connectionFactory,
-            StockUpdateSubscriber stockUpdateSubscriber
-    ) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
+    container.addMessageListener(
+        (message, pattern) -> stockUpdateSubscriber.handleMessage(message.toString()),
+        new PatternTopic("stock:updates:*"));
 
-        container.addMessageListener(
-                (message, pattern) -> stockUpdateSubscriber.handleMessage(message.toString()),
-                new PatternTopic("stock:updates:*")
-        );
-
-        return container;
-    }
-
+    return container;
+  }
 }

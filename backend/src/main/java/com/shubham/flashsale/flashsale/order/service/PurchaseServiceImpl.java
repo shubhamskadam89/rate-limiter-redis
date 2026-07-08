@@ -26,79 +26,78 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PurchaseServiceImpl implements PurchaseService {
 
-    private final OrderRepository orderRepository;
-    private final FlashSalePurchaseExecutor purchaseExecutor;
-    private final CommonAuthService commonAuthService;
-    private final SaleItemRepository saleItemRepository;
-    private final CommonFlashSaleService commonFlashSaleService;
-    private final OrderQueueProducer orderQueueProducer;
-    private final StockUpdatePublisher stockUpdatePublisher;
+  private final OrderRepository orderRepository;
+  private final FlashSalePurchaseExecutor purchaseExecutor;
+  private final CommonAuthService commonAuthService;
+  private final SaleItemRepository saleItemRepository;
+  private final CommonFlashSaleService commonFlashSaleService;
+  private final OrderQueueProducer orderQueueProducer;
+  private final StockUpdatePublisher stockUpdatePublisher;
 
-    @Override
-    @Transactional
-    public PurchaseResponse purchase(
-            String saleUuid,
-            String saleItemUuid,
-            String idempotencyKey,
-            PurchaseRequest request
-    ) {
-        log.info("Initiating flash sale purchase. SaleUUID: {}, ItemUUID: {}, IdempotencyKey: {}, RequestedQty: {}",
-                saleUuid, saleItemUuid, idempotencyKey, request.getQuantity());
+  @Override
+  @Transactional
+  public PurchaseResponse purchase(
+      String saleUuid, String saleItemUuid, String idempotencyKey, PurchaseRequest request) {
+    log.info(
+        "Initiating flash sale purchase. SaleUUID: {}, ItemUUID: {}, IdempotencyKey: {}, RequestedQty: {}",
+        saleUuid,
+        saleItemUuid,
+        idempotencyKey,
+        request.getQuantity());
 
-        SaleItem saleItem = saleItemRepository.findByUuid(saleItemUuid)
-                .orElseThrow(() -> {
-                    log.warn("Purchase failed: Sale item not found. ItemUUID: {}", saleItemUuid);
-                    return new SaleItemNotFoundException(saleItemUuid);
+    SaleItem saleItem =
+        saleItemRepository
+            .findByUuid(saleItemUuid)
+            .orElseThrow(
+                () -> {
+                  log.warn("Purchase failed: Sale item not found. ItemUUID: {}", saleItemUuid);
+                  return new SaleItemNotFoundException(saleItemUuid);
                 });
 
-        log.debug("Validating item membership and event status for ItemUUID: {}", saleItemUuid);
-        SaleEvent saleEvent = commonFlashSaleService.validateSaleItemBelongsToSale(saleItem, saleUuid);
-        commonFlashSaleService.validateSaleEvent(saleEvent);
+    log.debug("Validating item membership and event status for ItemUUID: {}", saleItemUuid);
+    SaleEvent saleEvent = commonFlashSaleService.validateSaleItemBelongsToSale(saleItem, saleUuid);
+    commonFlashSaleService.validateSaleEvent(saleEvent);
 
-        User user = commonAuthService.getCurrentUser();
-        log.debug("Executing Lua script token bucket/inventory check for UserUUID: {}, ItemUUID: {}", user.getUuid(), saleItem.getUuid());
+    User user = commonAuthService.getCurrentUser();
+    log.debug(
+        "Executing Lua script token bucket/inventory check for UserUUID: {}, ItemUUID: {}",
+        user.getUuid(),
+        saleItem.getUuid());
 
-        PurchaseResult result = purchaseExecutor.execute(
-                saleItem.getUuid(),
-                user.getUuid(),
-                request.getQuantity(),
-                saleItem.getMaxPerUser()
-        );
+    PurchaseResult result =
+        purchaseExecutor.execute(
+            saleItem.getUuid(), user.getUuid(), request.getQuantity(), saleItem.getMaxPerUser());
 
-        log.debug("Lua execution finished. Result status: {}", result.status());
-        commonFlashSaleService.validatePurchaseResult(result);
+    log.debug("Lua execution finished. Result status: {}", result.status());
+    commonFlashSaleService.validatePurchaseResult(result);
 
-        stockUpdatePublisher.publish(
-                StockUpdateEvent.builder()
-                        .saleUuid(saleUuid)
-                        .saleItemUuid(saleItem.getUuid())
-                        .remainingInventory(result.remainingInventory())
-                        .build()
-        );
+    stockUpdatePublisher.publish(
+        StockUpdateEvent.builder()
+            .saleUuid(saleUuid)
+            .saleItemUuid(saleItem.getUuid())
+            .remainingInventory(result.remainingInventory())
+            .build());
 
-        log.info("Inventory reserved successfully in Redis. Queueing order for asynchronous persistence. userUuid={}", user.getUuid());
+    log.info(
+        "Inventory reserved successfully in Redis. Queueing order for asynchronous persistence. userUuid={}",
+        user.getUuid());
 
-        OrderQueueMessage message = OrderQueueMessage.create(
-                user.getUuid(),
-                saleItem.getUuid(),
-                request.getQuantity(),
-                saleItem.getSalePrice(),
-                idempotencyKey
-        );
+    OrderQueueMessage message =
+        OrderQueueMessage.create(
+            user.getUuid(),
+            saleItem.getUuid(),
+            request.getQuantity(),
+            saleItem.getSalePrice(),
+            idempotencyKey);
 
-        orderQueueProducer.enqueue(message);
+    orderQueueProducer.enqueue(message);
 
-        log.info(
-                "Purchase flow completed successfully. Order queued. orderUuid={}, userUuid={}, saleItemUuid={}",
-                message.getOrderUuid(),
-                user.getUuid(),
-                saleItem.getUuid()
-        );
+    log.info(
+        "Purchase flow completed successfully. Order queued. orderUuid={}, userUuid={}, saleItemUuid={}",
+        message.getOrderUuid(),
+        user.getUuid(),
+        saleItem.getUuid());
 
-        return commonFlashSaleService.buildQueuedPurchaseResponse(
-                message,
-                saleItem,
-                result
-        );
-    }
+    return commonFlashSaleService.buildQueuedPurchaseResponse(message, saleItem, result);
+  }
 }

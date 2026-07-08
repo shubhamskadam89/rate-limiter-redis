@@ -1,5 +1,5 @@
-
 # Flash Sale Engine & API Rate Limiting Gateway
+
 [![Backend CI](https://github.com/shubhamskadam89/rate-limiter-redis/actions/workflows/ci.yml/badge.svg)](https://github.com/shubhamskadam89/rate-limiter-redis/actions/workflows/ci.yml)
 [![Docker Backend](https://img.shields.io/docker/v/shubhamskadam89/flash-sale-backend?label=backend&logo=docker)](https://hub.docker.com/repository/docker/shubhamskadam89/flash-sale-backend/general)
 [![Docker Frontend](https://img.shields.io/docker/v/shubhamskadam89/flash-sale-frontend?label=frontend&logo=docker)](https://hub.docker.com/repository/docker/shubhamskadam89/flash-sale-frontend/general)
@@ -7,6 +7,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
 [![Redis](https://img.shields.io/badge/Redis-7-red?logo=redis)](https://redis.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A production-inspired distributed backend system built to explore the engineering challenges behind high-concurrency flash sale platforms while following software engineering practices commonly used during real-world backend development.
 
 ---
@@ -86,13 +87,6 @@ Requests flow through a layered pipeline — authentication, distributed rate li
 
 A purchase request executes an atomic Redis Lua script to validate inventory and enforce per-user limits, queues the order for asynchronous persistence, and immediately broadcasts the updated stock count to connected clients via SSE — so the write path never blocks on the database.
 
-## Architecture Snapshot
-
-Requests flow through a layered pipeline — authentication, distributed rate limiting, and idempotency checks — before reaching the business layer. Redis holds all concurrency-sensitive state (rate limit counters, inventory locks, idempotency keys), while MySQL is the system of record. Because the application layer is stateless and backed by Redis, it's designed to scale horizontally behind Nginx without sacrificing consistency.
-
-A purchase request executes an atomic Redis Lua script to validate inventory and enforce per-user limits, queues the order for asynchronous persistence, and immediately broadcasts the updated stock count to connected clients via SSE — so the write path never blocks on the database.
-
-
 ```mermaid
 flowchart LR
     Client["Client / React Frontend"]
@@ -125,6 +119,77 @@ flowchart TD
 
 > 📖 Full request-lifecycle sequence diagrams, deployment topology, and architectural decisions live in [docs/architecture.md](docs/architecture.md).
 
+---
+
+## Getting Started
+
+### 🚀 Option 1 — Run with Docker (Recommended)
+
+> The fastest way to explore the application. Pre-built images are pulled from Docker Hub.
+> No Java, Maven, or Node.js installation required.
+>
+> **Best for:** Recruiters, interviewers, and anyone evaluating the project.
+
+**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
+
+```bash
+# 1. Clone the repository (needed for config files — nginx, prometheus, grafana)
+git clone https://github.com/shubhamskadam89/rate-limiter-redis.git
+cd rate-limiter-redis
+
+# 2. Copy the environment file
+cp .env.example .env
+
+# 3. Start the full stack
+docker compose up -d
+```
+
+That's it. Docker pulls the backend and frontend images from Docker Hub automatically.
+
+| Service | URL |
+|---|---|
+| Application | http://localhost |
+| Swagger UI | http://localhost/swagger-ui/index.html |
+| Grafana | http://localhost/grafana &nbsp; *(admin / admin)* |
+| Prometheus | http://localhost:9090 |
+
+> **Default credentials** — Admin: `admin@example.com` / `password` &nbsp;·&nbsp; User: `user@example.com` / `password`
+
+---
+
+### 🛠 Option 2 — Build from Source
+
+> Run the project locally for development or to explore and modify the implementation.
+>
+> **Best for:** Developers, contributors, and anyone learning the codebase.
+
+**Prerequisites:** Java 21, Maven, Node.js 22, Docker Desktop
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/shubhamskadam89/rate-limiter-redis.git
+cd rate-limiter-redis
+
+# 2. Copy the environment file
+cp .env.example .env
+
+# 3. Start infrastructure (MySQL, Redis, Nginx, Prometheus, Grafana)
+cd docker && docker compose up -d mysql redis prometheus grafana nginx
+
+# 4. Run the backend
+cd ../backend
+./mvnw spring-boot:run
+
+# 5. Run the frontend (in a separate terminal)
+cd ../frontend
+npm install
+npm run dev
+```
+
+The frontend dev server starts at `http://localhost:5173`.
+
+---
+
 ## Demo
 
 The following screenshots demonstrate the core workflows implemented in the project.
@@ -139,6 +204,4 @@ The following screenshots demonstrate the core workflows implemented in the proj
 
 | Observability | Continuous Integration |
 |---------------|------------------------|
-| <img width="500" alt="dashboard-grafana" src="https://github.com/user-attachments/assets/95c144b0-ed4a-4ae0-932a-10474d04edb7" />| <img width="500"  alt="github_actions_workflows_rate-limiter-redis_08-07-26" src="https://github.com/user-attachments/assets/e1dacdba-a906-48d2-b473-6e2426b99ff2" />
- |
-
+| <img width="500" alt="dashboard-grafana" src="https://github.com/user-attachments/assets/95c144b0-ed4a-4ae0-932a-10474d04edb7" />| <img width="500"  alt="github_actions_workflows_rate-limiter-redis_08-07-26" src="https://github.com/user-attachments/assets/e1dacdba-a906-48d2-b473-6e2426b99ff2" />|

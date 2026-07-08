@@ -12,23 +12,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StockUpdateSubscriber {
 
-    private final ObjectMapper objectMapper;
-    private final SseEmitterRegistry emitterRegistry;
+  private final ObjectMapper objectMapper;
+  private final SseEmitterRegistry emitterRegistry;
 
-    public void handleMessage(String message) {
-        try {
-            StockUpdateEvent event = objectMapper.readValue(message, StockUpdateEvent.class);
+  public void handleMessage(String message) {
+    try {
+      StockUpdateEvent event = objectMapper.readValue(message, StockUpdateEvent.class);
 
-            log.info(
-                    "Received stock update event from Redis. saleItemUuid={}, remainingInventory={}",
-                    event.getSaleItemUuid(),
-                    event.getRemainingInventory()
-            );
+      log.info(
+          "Received stock update event from Redis. saleItemUuid={}, remainingInventory={}",
+          event.getSaleItemUuid(),
+          event.getRemainingInventory());
 
-            emitterRegistry.broadcast(event);
+      emitterRegistry.broadcast(event);
 
-        } catch (JsonProcessingException e) {
-            log.error("Failed to deserialize stock update event. payload={}", message, e);
-        }
+    } catch (JsonProcessingException e) {
+      log.error("Failed to deserialize stock update event. payload={}", message, e);
     }
+  }
 }

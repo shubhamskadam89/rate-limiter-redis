@@ -1,9 +1,8 @@
 package com.shubham.flashsale.flashsale.inventory.dto;
 
-import lombok.*;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.*;
 
 @Getter
 @Setter
@@ -12,13 +11,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class InventoryResponse {
 
-    private UUID saleItemUuid;
+  private UUID saleItemUuid;
 
-    private Long remainingInventory;
+  private Long remainingInventory;
 
-    private String availability;
+  private String availability;
 
-    private Instant asOf;
+  private Instant asOf;
 
-    private String source;
+  private String source;
 }

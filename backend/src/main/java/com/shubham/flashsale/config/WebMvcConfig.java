@@ -1,6 +1,5 @@
 package com.shubham.flashsale.config;
 
-
 import com.shubham.flashsale.ratelimit.web.RateLimitInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +10,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final RateLimitInterceptor rateLimitInterceptor;
+  private final RateLimitInterceptor rateLimitInterceptor;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
 
-        registry.addInterceptor(rateLimitInterceptor);
-    }
-
+    registry.addInterceptor(rateLimitInterceptor);
+  }
 }

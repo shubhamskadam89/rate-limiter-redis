@@ -4,6 +4,5 @@ import com.shubham.flashsale.flashsale.order.queue.OrderQueueMessage;
 
 public interface OrderPersistenceService {
 
-    void persist(OrderQueueMessage message);
-
+  void persist(OrderQueueMessage message);
 }

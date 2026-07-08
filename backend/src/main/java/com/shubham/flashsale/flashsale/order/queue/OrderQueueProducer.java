@@ -11,33 +11,25 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class OrderQueueProducer{
+public class OrderQueueProducer {
 
-    private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
+  private final StringRedisTemplate redisTemplate;
+  private final ObjectMapper objectMapper;
 
-    public void enqueue(OrderQueueMessage msg){
-        try{
-            String payload = objectMapper.writeValueAsString(msg);
+  public void enqueue(OrderQueueMessage msg) {
+    try {
+      String payload = objectMapper.writeValueAsString(msg);
 
-            redisTemplate.opsForList().leftPush(
-                    RedisKeyBuilder.orderQueue(),
-                    payload
-            );
-            log.info(
-                    "Order message queued. orderUuid={}, userUuid={}, saleItemUuid={}, queueKey={}",
-                    msg.getOrderUuid(),
-                    msg.getUserUuid(),
-                    msg.getSaleItemUuid(),
-                    RedisKeyBuilder.orderQueue()
-            );
-        } catch (JsonProcessingException e) {
-            log.error(
-                    "Failed to serialize order queue message. orderUuid={}",
-                    msg.getOrderUuid(),
-                    e
-            );
-            throw new IllegalStateException("Failed to enqueue order message", e);
-        }
+      redisTemplate.opsForList().leftPush(RedisKeyBuilder.orderQueue(), payload);
+      log.info(
+          "Order message queued. orderUuid={}, userUuid={}, saleItemUuid={}, queueKey={}",
+          msg.getOrderUuid(),
+          msg.getUserUuid(),
+          msg.getSaleItemUuid(),
+          RedisKeyBuilder.orderQueue());
+    } catch (JsonProcessingException e) {
+      log.error("Failed to serialize order queue message. orderUuid={}", msg.getOrderUuid(), e);
+      throw new IllegalStateException("Failed to enqueue order message", e);
     }
+  }
 }

@@ -1,9 +1,8 @@
 package com.shubham.flashsale.product.dto;
 
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.*;
 
 @Getter
 @Setter
@@ -12,15 +11,15 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ProductResponse {
 
-    private UUID uuid;
+  private UUID uuid;
 
-    private String name;
+  private String name;
 
-    private String description;
+  private String description;
 
-    private BigDecimal basePrice;
+  private BigDecimal basePrice;
 
-    private java.util.Map<String, Object> metadata;
+  private java.util.Map<String, Object> metadata;
 
-    private Boolean isActive;
+  private Boolean isActive;
 }

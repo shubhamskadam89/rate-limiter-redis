@@ -1,8 +1,7 @@
 package com.shubham.flashsale.flashsale.sale.dto;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -11,9 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CreateSaleRequest {
 
-    private String name;
+  private String name;
 
-    private LocalDateTime startTime;
+  private LocalDateTime startTime;
 
-    private LocalDateTime endTime;
+  private LocalDateTime endTime;
 }

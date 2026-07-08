@@ -5,10 +5,6 @@ import com.shubham.flashsale.flashsale.order.dto.PurchaseResponse;
 
 public interface PurchaseService {
 
-    PurchaseResponse purchase(
-            String saleUuid,
-            String saleItemUuid,
-            String idempotencyKey,
-            PurchaseRequest request
-    );
+  PurchaseResponse purchase(
+      String saleUuid, String saleItemUuid, String idempotencyKey, PurchaseRequest request);
 }

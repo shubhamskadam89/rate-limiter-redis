@@ -1,64 +1,62 @@
 package com.shubham.flashsale.common.redis;
 
-import java.util.UUID;
-
 public final class RedisKeyBuilder {
 
-    private RedisKeyBuilder() {}
+  private RedisKeyBuilder() {}
 
-    // ===========================
-    // Rate Limiting
-    // ===========================
+  // ===========================
+  // Rate Limiting
+  // ===========================
 
-    public static String fixedWindow(String policy, String identifier) {
-        return "rate:fw:" + policy + ":" + identifier;
-    }
+  public static String fixedWindow(String policy, String identifier) {
+    return "rate:fw:" + policy + ":" + identifier;
+  }
 
-    public static String slidingWindow(String policy, String identifier) {
-        return "rate:sw:" + policy + ":" + identifier;
-    }
+  public static String slidingWindow(String policy, String identifier) {
+    return "rate:sw:" + policy + ":" + identifier;
+  }
 
-    public static String tokenBucket(String policy, String identifier) {
-        return "rate:tb:" + policy + ":" + identifier;
-    }
+  public static String tokenBucket(String policy, String identifier) {
+    return "rate:tb:" + policy + ":" + identifier;
+  }
 
-    // ===========================
-    // Flash Sale
-    // ===========================
+  // ===========================
+  // Flash Sale
+  // ===========================
 
-    public static String inventory(String saleItemUuid) {
-        return "inventory:" + saleItemUuid;
-    }
+  public static String inventory(String saleItemUuid) {
+    return "inventory:" + saleItemUuid;
+  }
 
-    public static String userPurchase(String saleItemUuid, String userUuid) {
-        return "user_purchases:" + saleItemUuid + ":" + userUuid;
-    }
+  public static String userPurchase(String saleItemUuid, String userUuid) {
+    return "user_purchases:" + saleItemUuid + ":" + userUuid;
+  }
 
-    // ===========================
-    // Idempotency
-    // ===========================
+  // ===========================
+  // Idempotency
+  // ===========================
 
-    public static String idempotency(String key) {
-        return "idem:" + key;
-    }
+  public static String idempotency(String key) {
+    return "idem:" + key;
+  }
 
-    // ===========================
-    // Async Order Queue
-    // ===========================
+  // ===========================
+  // Async Order Queue
+  // ===========================
 
-    public static String orderQueue() {
-        return "orders:queue";
-    }
+  public static String orderQueue() {
+    return "orders:queue";
+  }
 
-    // ===========================
-    // Pub/Sub
-    // ===========================
+  // ===========================
+  // Pub/Sub
+  // ===========================
 
-    public static String stockUpdates(String saleItemUuid) {
-        return "stock:updates:" + saleItemUuid;
-    }
+  public static String stockUpdates(String saleItemUuid) {
+    return "stock:updates:" + saleItemUuid;
+  }
 
-    public static String orderRetryQueue() {
-        return "orders:queue:retry";
-    }
+  public static String orderRetryQueue() {
+    return "orders:queue:retry";
+  }
 }

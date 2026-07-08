@@ -7,13 +7,13 @@ import lombok.Setter;
 @Setter
 public class PolicyConfiguration {
 
-    private RateLimitAlgorithm algorithm;
+  private RateLimitAlgorithm algorithm;
 
-    private long requests;
+  private long requests;
 
-    private long window;
+  private long window;
 
-    private Long burst;
+  private Long burst;
 
-    private Double refill;
+  private Double refill;
 }

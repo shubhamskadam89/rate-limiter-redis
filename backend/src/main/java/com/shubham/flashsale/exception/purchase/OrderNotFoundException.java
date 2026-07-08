@@ -1,8 +1,8 @@
 package com.shubham.flashsale.exception.purchase;
 
-public class OrderNotFoundException extends RuntimeException{
+public class OrderNotFoundException extends RuntimeException {
 
-    public OrderNotFoundException(String message){
-        super(message);
-    }
+  public OrderNotFoundException(String message) {
+    super(message);
+  }
 }

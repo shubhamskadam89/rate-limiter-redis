@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StrategyFactory {
 
-    private final FixedWindowStrategy fixedWindowStrategy;
-    private final SlidingWindowStrategy slidingWindowStrategy;
-    private final TokenBucketStrategy tokenBucketStrategy;
+  private final FixedWindowStrategy fixedWindowStrategy;
+  private final SlidingWindowStrategy slidingWindowStrategy;
+  private final TokenBucketStrategy tokenBucketStrategy;
 
-    public RateLimitingStrategy getStrategy(RateLimitAlgorithm algorithm) {
-        return switch (algorithm) {
-            case FIXED_WINDOW -> fixedWindowStrategy;
-            case SLIDING_WINDOW -> slidingWindowStrategy;
-            case TOKEN_BUCKET -> tokenBucketStrategy;
-        };
-    }
+  public RateLimitingStrategy getStrategy(RateLimitAlgorithm algorithm) {
+    return switch (algorithm) {
+      case FIXED_WINDOW -> fixedWindowStrategy;
+      case SLIDING_WINDOW -> slidingWindowStrategy;
+      case TOKEN_BUCKET -> tokenBucketStrategy;
+    };
+  }
 }
