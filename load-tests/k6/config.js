@@ -11,7 +11,7 @@ export const config = {
 
     PURCHASE_QTY: Number(__ENV.PURCHASE_QTY || 1),
 
-    RATE_LIMIT_ENDPOINT: __ENV.RATE_LIMIT_ENDPOINT || "/api/v1/sales/{saleUuid}/items/{saleItemUuid}/purchase",
+    RATE_LIMIT_ENDPOINT: __ENV.RATE_LIMIT_ENDPOINT || "/test/limit",
 
     DEFAULT_HEADERS: {
         "Content-Type": "application/json"

@@ -152,7 +152,7 @@ services:
       - flash-sale-network
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.13.0
     container_name: flash-sale-prometheus
 
     restart: unless-stopped
@@ -171,7 +171,7 @@ services:
       - flash-sale-network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.1.0
     container_name: flash-sale-grafana
 
     restart: unless-stopped
