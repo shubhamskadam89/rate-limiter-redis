@@ -25,7 +25,7 @@ public class DataSeeder implements CommandLineRunner {
     log.info("Checking if database seeding is required");
 
     if (userRepository.count() == 0) {
-      log.info("Seeding default users (ADMIN, VIP, USER)");
+      log.info("Seeding default users (ADMIN, USER)");
 
       User admin = new User();
       admin.setEmail("admin@flashsale.com");
@@ -33,11 +33,7 @@ public class DataSeeder implements CommandLineRunner {
       admin.setPasswordHash("$2a$10$dummyHash");
       admin.setRole(UserRole.ADMIN);
 
-      User vip = new User();
-      vip.setEmail("vip@flashsale.com");
-      vip.setFullName("VIP User");
-      vip.setPasswordHash("$2a$10$dummyHash");
-      vip.setRole(UserRole.VIP);
+
 
       User user = new User();
       user.setEmail("user@flashsale.com");
@@ -46,7 +42,7 @@ public class DataSeeder implements CommandLineRunner {
       user.setRole(UserRole.USER);
 
       userRepository.save(admin);
-      userRepository.save(vip);
+
       userRepository.save(user);
       log.info("Default users seeded successfully");
     }
