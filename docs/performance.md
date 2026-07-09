@@ -1165,6 +1165,16 @@ However, at **2,500 VUs** (Run 3), the system begins to experience queuing effec
 At **5,000 concurrent VUs** (Run 4), the system reached its absolute saturation ceiling.
 * **Client-Side Failure vs. Backend Correctness:** k6 reported `25,206` failed requests (primarily connection timeouts) and only `41` successful HTTP 200 responses. However, database verification showed that **`2,574` orders were successfully processed and persisted in MySQL**, and the Redis inventory was reduced by exactly `2,574` (remaining stock: `7,426`). This indicates that the backend remained functionally correct: the inventory reserves were decremented in Redis, and those orders were pushed into the queue and successfully written to MySQL. However, the response time was so high (P95: `35.5 seconds`) that k6 timed out before receiving the HTTP response.
 
+<div align="center" style="margin-top: 25px; margin-bottom: 25px;">
+
+### Figure 6.5 — CPU Utilization during the 5,000 VU Saturation Test
+
+<img src="https://github.com/user-attachments/assets/placeholder_grafana_cpu_saturation" alt="CPU Saturation Graph" width="600">
+
+<p style="font-size: 0.9em; font-style: italic; max-width: 650px; text-align: left; margin-top: 15px; line-height: 1.4;">Figure 6.5: CPU utilization increased rapidly as concurrency reached 5,000 virtual users, peaking at approximately 689% of the available 700% Docker CPU allocation. After CPU resources were exhausted, request latency increased sharply, Tomcat request queues filled, and NGINX began returning 502 responses. This demonstrates that the limiting factor during the saturation experiment was host compute capacity rather than application correctness.</p>
+
+</div>
+
 ### 3. Primary Bottlenecks Identified
 
 * **CPU Saturation:** Under 5,000 VUs, host CPU utilization hit **`98%`** (averaging `94%`). Running six Docker containers (NGINX, Spring Boot, Redis, MySQL, Prometheus, Grafana) along with the k6 generator on the same physical host resulted in severe CPU throttling and context-switching overhead.
