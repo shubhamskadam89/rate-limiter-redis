@@ -1,6 +1,6 @@
 import { check } from "k6";
 import { Counter, Rate, Trend } from "k6/metrics";
-import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+import { htmlReport } from "./bundle.js";
 
 import { login, purchase, discoverSale } from "./helpers.js";
 
@@ -60,17 +60,15 @@ export const options = {
 
 export function setup() {
 
-    console.log("Authenticating test user...");
+    console.log("Authenticating setup user...");
 
-    const token = login();
+    const token = login("user_1@flashsale.com", "password123");
 
     console.log("Authentication successful.");
 
     const sale = discoverSale(token);
 
     return {
-
-        token,
 
         saleUuid: sale.saleUuid,
 
@@ -88,10 +86,17 @@ export function setup() {
 |--------------------------------------------------------------------------
 */
 
+let vuToken = null;
+
 export default function (data) {
 
+    if (!vuToken) {
+        const vuId = __VU > 0 ? __VU : 1;
+        vuToken = login(`user_${vuId}@flashsale.com`, "password123");
+    }
+
     const response = purchase(
-        data.token,
+        vuToken,
         data.saleUuid,
         data.saleItemUuid
     );
@@ -154,14 +159,17 @@ export function handleSummary(data) {
     const avg = data.metrics.http_req_duration?.values?.avg ?? 0;
     const p95 = data.metrics.http_req_duration?.values?.["p(95)"] ?? 0;
 
+    const vus = __ENV.VUS || 500;
+    const duration = __ENV.DURATION || "30s";
+
     const textSummary = `
 ============================================================
 
 Flash Sale Load Test Summary
 
-Virtual Users : ${options.scenarios.flash_sale.vus}
+Virtual Users : ${vus}
 
-Duration      : ${options.scenarios.flash_sale.duration}
+Duration      : ${duration}
 
 Requests      : ${data.metrics.http_reqs?.values?.count ?? 0}
 

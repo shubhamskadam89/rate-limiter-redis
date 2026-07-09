@@ -8,13 +8,13 @@ import { config } from "./config.js";
 |--------------------------------------------------------------------------
 */
 
-export function login() {
+export function login(email = config.EMAIL, password = config.PASSWORD) {
 
     const response = http.post(
         `${config.BASE_URL}/api/v1/auth/login`,
         JSON.stringify({
-            email: config.EMAIL,
-            password: config.PASSWORD
+            email: email,
+            password: password
         }),
         {
             headers: config.DEFAULT_HEADERS
@@ -26,7 +26,7 @@ export function login() {
     });
 
     if (response.status !== 200) {
-        fail(`Unable to login.\n${response.body}`);
+        fail(`Unable to login for ${email}.\n${response.body}`);
     }
 
     return response.json().accessToken;

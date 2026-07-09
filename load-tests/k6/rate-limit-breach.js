@@ -1,7 +1,7 @@
 import http from "k6/http";
 import { check } from "k6";
 import { Counter, Rate, Trend } from "k6/metrics";
-import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+import { htmlReport } from "./bundle.js";
 
 import { login, discoverSale, authHeaders } from "./helpers.js";
 import { config } from "./config.js";
