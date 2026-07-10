@@ -91,7 +91,7 @@ let vuToken = null;
 export default function (data) {
 
     if (!vuToken) {
-        const vuId = __VU > 0 ? __VU : 1;
+        const vuId = __VU > 0 ? ((__VU - 1) % 5000) + 1 : 1;
         vuToken = login(`user_${vuId}@flashsale.com`, "password123");
     }
 
@@ -156,8 +156,8 @@ export default function (data) {
 
 export function handleSummary(data) {
 
-    const avg = data.metrics.http_req_duration?.values?.avg ?? 0;
-    const p95 = data.metrics.http_req_duration?.values?.["p(95)"] ?? 0;
+    const avg = (data && data.metrics && data.metrics.http_req_duration && data.metrics.http_req_duration.values && data.metrics.http_req_duration.values.avg) || 0;
+    const p95 = (data && data.metrics && data.metrics.http_req_duration && data.metrics.http_req_duration.values && data.metrics.http_req_duration.values["p(95)"]) || 0;
 
     const vus = __ENV.VUS || 500;
     const duration = __ENV.DURATION || "30s";

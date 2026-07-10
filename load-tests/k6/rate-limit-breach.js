@@ -195,8 +195,8 @@ export default function (data) {
 
 export function handleSummary(data) {
 
-    const avg = data.metrics.http_req_duration?.values?.avg ?? 0;
-    const p95 = data.metrics.http_req_duration?.values?.["p(95)"] ?? 0;
+    const avg = (data && data.metrics && data.metrics.http_req_duration && data.metrics.http_req_duration.values && data.metrics.http_req_duration.values.avg) || 0;
+    const p95 = (data && data.metrics && data.metrics.http_req_duration && data.metrics.http_req_duration.values && data.metrics.http_req_duration.values["p(95)"]) || 0;
 
     const algo = __ENV.ALGO || "UNKNOWN";
     const endpoint = config.RATE_LIMIT_ENDPOINT;
